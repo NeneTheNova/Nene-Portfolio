@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nene | Bot Dev & Server Management</title>
+    <link id="favicon" rel="icon" type="image/png" href="./assets/logo-sky.png">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#0a0d14',
+                            card: 'rgba(15, 23, 36, 0.65)',
+                            border: 'rgba(45, 212, 191, 0.18)',
+                            glow: '#2dd4bf',
+                            accent: '#38bdf8',
+                            pink: '#f472b6',
+                            purple: '#a855f7'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #06090e;
+            color: #e2e8f0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* ===== THEME VARIABLES =====
+           Three themes drive the entire site skin:
+           - "sky"  -> Blue Archive Plana wallpaper + Suzume theme song (blue)
+           - "idol" -> Ai Hoshino artwork + Idol (YOASOBI) song (pink/purple)
+           - "zoro" -> Emerald Fury Zoro wallpaper + One Piece theme (green)
+           Switching data-theme on <body> reskins every element below. */
+        body[data-theme="sky"] {
+            --theme-accent: #3b82f6;
+            --theme-accent-rgb: 59, 130, 246;
+            --theme-secondary: #60a5fa;
+            --theme-secondary-rgb: 96, 165, 250;
+        }
+        body[data-theme="idol"] {
+            --theme-accent: #ec4899;
+            --theme-accent-rgb: 236, 72, 153;
+            --theme-secondary: #c084fc;
+            --theme-secondary-rgb: 192, 132, 252;
+        }
+        body[data-theme="zoro"] {
+            --theme-accent: #22c55e;
+            --theme-accent-rgb: 34, 197, 94;
+            --theme-secondary: #84cc16;
+            --theme-secondary-rgb: 132, 204, 22;
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(10, 14, 22, 0.32);
+            backdrop-filter: blur(9px);
+            -webkit-backdrop-filter: blur(9px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+        }
+
+        .glass-card {
+            background: rgba(15, 22, 35, 0.28);
+            backdrop-filter: blur(7px);
+            -webkit-backdrop-filter: blur(7px);
+            border: 1px solid rgba(var(--theme-accent-rgb), 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(var(--theme-accent-rgb), 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px -8px rgba(var(--theme-accent-rgb), 0.2);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--theme-accent);
+        }
+
+        /* Ambient Canvas & Overlay */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 30%, rgba(var(--theme-accent-rgb), 0.12), transparent 70%),
+                        linear-gradient(to bottom, rgba(6, 9, 14, 0.22), rgba(6, 9, 14, 0.48));
+            z-index: -1;
+            pointer-events: none;
+            transition: background 1s ease;
+        }
+
+        /* Active Tab Highlight */
+        .nav-btn.active {
+            color: var(--theme-accent);
+            background: rgba(var(--theme-accent-rgb), 0.12);
+            border: 1px solid rgba(var(--theme-accent-rgb), 0.3);
+        }
+
+        /* Glow effects */
+        .neon-glow {
+            text-shadow: 0 0 12px rgba(var(--theme-accent-rgb), 0.5);
+        }
+
+        .badge-cyan {
+            background: rgba(var(--theme-accent-rgb), 0.12);
+            color: var(--theme-accent);
+            border: 1px solid rgba(var(--theme-accent-rgb), 0.3);
+        }
+        .badge-purple {
+            background: rgba(168, 85, 247, 0.12);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+        .badge-pink {
+            background: rgba(244, 114, 182, 0.12);
+            color: #f472b6;
+            border: 1px solid rgba(244, 114, 182, 0.3);
+        }
+
+        /* ===== GLOBAL BRAND RESKIN =====
+           These override the Tailwind teal/cyan utility classes used across the
+           markup so the entire page recolors with the active theme. Category
+           badges (purple/pink/indigo/amber/rose/emerald) are left untouched
+           since they carry their own meaning and aren't part of the site skin. */
+        .text-teal-400, .text-teal-300 { color: var(--theme-accent) !important; }
+        .text-cyan-400, .text-cyan-300 { color: var(--theme-secondary) !important; }
+        .border-teal-500\/20, .border-teal-500\/30, .border-teal-500\/40 { border-color: rgba(var(--theme-accent-rgb), 0.3) !important; }
+        .border-cyan-500\/30 { border-color: rgba(var(--theme-secondary-rgb), 0.3) !important; }
+        .bg-teal-500, .bg-teal-400 { background-color: var(--theme-accent) !important; }
+        .bg-teal-500\/10 { background-color: rgba(var(--theme-accent-rgb), 0.1) !important; }
+        .bg-teal-500\/20 { background-color: rgba(var(--theme-accent-rgb), 0.2) !important; }
+        .bg-teal-500\/30 { background-color: rgba(var(--theme-accent-rgb), 0.3) !important; }
+        .bg-cyan-500\/10 { background-color: rgba(var(--theme-secondary-rgb), 0.1) !important; }
+        .bg-cyan-500\/20 { background-color: rgba(var(--theme-secondary-rgb), 0.2) !important; }
+        .bg-cyan-500\/30 { background-color: rgba(var(--theme-secondary-rgb), 0.3) !important; }
+        .shadow-teal-500\/10, .shadow-teal-500\/20, .shadow-teal-500\/25 { --tw-shadow-color: rgba(var(--theme-accent-rgb), 0.3) !important; }
+        .from-teal-500 { --tw-gradient-from: var(--theme-accent) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(255,255,255,0)) !important; }
+        .to-cyan-400 { --tw-gradient-to: var(--theme-secondary) !important; }
+        ::selection { background-color: var(--theme-accent); color: #06090e; }
+
+        /* Video element full cover, softly blurred per request. Shared by
+           both the sky and zoro video backgrounds. */
+        #bg-video, #bg-video-zoro {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -3;
+            transform: translate(-50%, -50%) scale(1.08);
+            object-fit: cover;
+            opacity: 0;
+            filter: blur(4px) saturate(1.15) brightness(0.95);
+            transition: opacity 1.2s ease;
+        }
+
+        #bg-image-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            z-index: -3;
+            opacity: 0;
+            transition: opacity 1.2s ease;
+            filter: blur(6px) brightness(0.85) saturate(1.15);
+            transform: scale(1.05);
+        }
+
+        /* Volume Slider Customization */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: var(--theme-accent);
+            cursor: pointer;
+            margin-top: -4px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #1e293b;
+            border-radius: 2px;
+        }
+
+        /* ===== Discord presence card ===== */
+        #discord-status-card { min-height: 150px; }
+        #discord-card-bg {
+            filter: blur(22px) brightness(0.45) saturate(1.2);
+            transform: scale(1.3);
+            transition: background-image 0.6s ease;
+        }
+        #discord-avatar { background: #1e293b; }
+        #discord-status-dot {
+            box-shadow: 0 0 0 2px #0a0d14;
+        }
+        .marquee-box { overflow: hidden; white-space: nowrap; position: relative; }
+        .marquee-track { display: inline-flex; align-items: center; will-change: transform; }
+        @keyframes marquee-scroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+        .marquee-active { animation-name: marquee-scroll; animation-timing-function: linear; animation-iteration-count: infinite; }
+
+        /* ===== Click-to-enter overlay =====
+           Browsers block audio autoplay until a real user gesture happens.
+           This screen IS that gesture — the click both reveals the site and
+           starts the audio in the same instant, so there's no lag and no
+           silent guessing about whether autoplay worked. The background is
+           already loading/playing behind it (muted video, particles, theme
+           colors all set up immediately) — the overlay just sits on top,
+           translucent, so that's visible through it. */
+        #start-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: radial-gradient(circle at 50% 50%, rgba(3, 6, 12, 0.25) 0%, rgba(3, 6, 12, 0.5) 45%, rgba(3, 6, 12, 0.78) 100%);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        #start-overlay.overlay-hidden {
+            opacity: 0;
+            transform: translateY(-16px);
+            pointer-events: none;
+        }
+        #start-overlay .click-text {
+            font-weight: 600;
+            font-size: 1.4rem;
+            color: #f1f5f9;
+            letter-spacing: 0.01em;
+            opacity: 0;
+            transform: translateY(28px);
+            animation: text-rise-in 0.8s ease 0.1s forwards, text-breathe 2.6s ease-in-out 1s infinite;
+        }
+        @keyframes text-rise-in {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes text-breathe {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ===== Site reveal =====
+           Header, page content, and footer all rise up from below into place
+           the instant the overlay is dismissed, staggered slightly for a
+           smooth cascading entrance rather than a hard cut. */
+        header, main, footer {
+            opacity: 0;
+            transform: translateY(36px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        body.site-revealed header { opacity: 1; transform: translateY(0); transition-delay: 0.05s; }
+        body.site-revealed main { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+        body.site-revealed footer { opacity: 1; transform: translateY(0); transition-delay: 0.35s; }
+    </style>
+</head>
+<body data-theme="sky" class="min-h-screen flex flex-col justify-between relative selection:bg-teal-500 selection:text-black">
+
+    <!-- Click-to-enter gate: reveals the site and starts audio in the same click -->
+    <div id="start-overlay">
+        <span class="click-text">click to enter...</span>
+    </div>
+
+    <!-- Background Media Layers -->
+    <video id="bg-video" autoplay loop muted playsinline>
+        <source src="./assets/sky-bg.mp4" type="video/mp4">
+    </video>
+    <video id="bg-video-zoro" autoplay loop muted playsinline>
+        <source src="./assets/zoro-bg.mp4" type="video/mp4">
+    </video>
+    <div id="bg-image-layer" style="background-image: url('./assets/idol-bg.png');"></div>
+
+    <script>
+        // Runs immediately, before the rest of the page even parses, so
+        // there's zero flash of a default theme. Also avoids repeating
+        // whichever theme played last time (stored in localStorage), so a
+        // refresh reliably gives you a different one.
+        (function () {
+            var themes = ['sky', 'idol', 'zoro'];
+            var last = null;
+            try { last = localStorage.getItem('nene_last_theme'); } catch (e) {}
+            var pool = (last && themes.indexOf(last) !== -1)
+                ? themes.filter(function (t) { return t !== last; })
+                : themes;
+            var choice = pool[Math.floor(Math.random() * pool.length)];
+            try { localStorage.setItem('nene_last_theme', choice); } catch (e) {}
+            window.__startTheme = choice;
+
+            document.body.dataset.theme = choice;
+            var bgVideoEl = document.getElementById('bg-video');
+            var bgVideoZoroEl = document.getElementById('bg-video-zoro');
+            var bgImageLayerEl = document.getElementById('bg-image-layer');
+            if (bgVideoEl) bgVideoEl.style.opacity = (choice === 'sky') ? '0.55' : '0';
+            if (bgVideoZoroEl) bgVideoZoroEl.style.opacity = (choice === 'zoro') ? '0.6' : '0';
+            if (bgImageLayerEl) bgImageLayerEl.style.opacity = (choice === 'idol') ? '0.7' : '0';
+        })();
+    </script>
+    <canvas id="bg-canvas"></canvas>
+    <div class="bg-overlay"></div>
+
+    <!-- MAIN NAVBAR -->
+    <header class="sticky top-0 z-50 px-4 py-3 border-b border-slate-800/80 glass-panel">
+        <div class="max-w-7xl mx-auto flex flex-col gap-3">
+            
+            <!-- Top Row: Brand & Audio Control Box (Now side by side on laptop) -->
+            <div class="flex items-center justify-between gap-4 w-full flex-wrap lg:flex-nowrap">
+                <!-- Brand / Name -->
+                <a href="https://discord.com/users/813355382960553994" target="_blank" class="flex items-center gap-3 cursor-pointer group shrink-0">
+                    <div id="brand-logo-wrap" class="w-10 h-10 rounded-full bg-gradient-to-tr from-teal-500 to-cyan-400 p-[2px] shadow-lg shadow-teal-500/20 group-hover:scale-105 transition overflow-hidden">
+                        <img id="brand-logo-img" src="./assets/logo-sky.png" alt="Nene" class="w-full h-full object-cover rounded-full">
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-lg tracking-wider text-white">Nene</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full badge-cyan font-mono font-semibold">SERVER MGT & DEV</span>
+                        </div>
+                        <p class="text-xs text-slate-400">Bot Developer • Server Manager • Moderator</p>
+                    </div>
+                </a>
+
+                <!-- Navigation Links (Moved up to top row on large screens to sit cleanly alongside Brand & Audio) -->
+                <nav class="hidden lg:flex items-center gap-1 overflow-x-auto py-1 no-scrollbar text-xs font-semibold uppercase tracking-wider justify-center bg-slate-900/40 px-3 py-1.5 rounded-xl border border-slate-800/60">
+                    <button onclick="switchSection('home')" id="nav-home" class="nav-btn active px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50">Home</button>
+                    <button onclick="switchSection('work')" id="nav-work" class="nav-btn px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50">Work</button>
+                    <button onclick="switchSection('tester')" id="nav-tester" class="nav-btn px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50">Tester</button>
+                    <button onclick="switchSection('moderator')" id="nav-moderator" class="nav-btn px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50">Moderator</button>
+                    <button onclick="switchSection('bots')" id="nav-bots" class="nav-btn px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50 flex items-center gap-1.5">
+                        <span>Bots</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-ping"></span>
+                    </button>
+                    <button onclick="switchSection('about')" id="nav-about" class="nav-btn px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50">About</button>
+                </nav>
+
+                <!-- Audio Control Box -->
+                <div class="flex items-center gap-2.5 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 relative shrink-0">
+                    <button id="music-toggle-btn" onclick="toggleAudio()" class="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-300 flex items-center justify-center hover:bg-teal-500/30 transition" title="Toggle Music">
+                        <i id="music-icon" class="fas fa-play"></i>
+                    </button>
+                    <div class="flex flex-col pr-1 w-28">
+                        <span id="current-track-name" class="text-[10px] text-teal-300 font-mono font-medium truncate">Suzume - RADWIMPS</span>
+                        <div class="flex items-center justify-between mt-0.5">
+                            <div class="flex items-center gap-1 text-[9px] text-slate-400">
+                                <button onclick="switchTheme('sky')" class="hover:text-teal-400 cursor-pointer">Sky</button>
+                                <span>•</span>
+                                <button onclick="switchTheme('idol')" class="hover:text-pink-400 cursor-pointer">Idol</button>
+                                <span>•</span>
+                                <button onclick="switchTheme('zoro')" class="hover:text-green-400 cursor-pointer">Zoro</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Collapsible Volume Slider Container -->
+                    <div class="relative flex items-center pl-1 border-l border-slate-700/80">
+                        <button onclick="toggleVolumeSlider(event)" class="w-7 h-7 rounded-lg text-slate-400 hover:text-teal-300 hover:bg-slate-800 flex items-center justify-center transition" title="Volume">
+                            <i class="fas fa-volume-up text-xs"></i>
+                        </button>
+                        <div id="volume-popup" class="absolute right-0 top-10 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 p-2.5 rounded-xl shadow-xl z-50 flex items-center gap-2 opacity-0 scale-95 pointer-events-none transition-all duration-300 transform origin-top-right">
+                            <i class="fas fa-volume-down text-[10px] text-slate-400"></i>
+                            <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.3" class="w-20 h-1">
+                            <i class="fas fa-volume-up text-[10px] text-slate-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Second Row: Navigation Links (For mobile screens) -->
+            <nav class="flex lg:hidden items-center gap-1 overflow-x-auto py-1 no-scrollbar text-xs font-semibold uppercase tracking-wider justify-start border-t border-slate-800/50 pt-2">
+                <button onclick="switchSection('home')" id="nav-home-mobile" class="nav-btn active px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50">Home</button>
+                <button onclick="switchSection('work')" id="nav-work-mobile" class="nav-btn px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50">Work</button>
+                <button onclick="switchSection('tester')" id="nav-tester-mobile" class="nav-btn px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50">Tester</button>
+                <button onclick="switchSection('moderator')" id="nav-moderator-mobile" class="nav-btn px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50">Moderator</button>
+                <button onclick="switchSection('bots')" id="nav-bots-mobile" class="nav-btn px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50 flex items-center gap-1.5">
+                    <span>Bots</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-ping"></span>
+                </button>
+                <button onclick="switchSection('about')" id="nav-about-mobile" class="nav-btn px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50">About</button>
+            </nav>
+
+        </div>
+    </header>
+
+    <!-- CONTENT WRAPPER -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-1 w-full">
+
+        <!-- ================= HOME SECTION ================= -->
+        <section id="section-home" class="space-y-10">
+            
+            <!-- Hero Stats Bar -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div class="glass-card p-4 rounded-2xl text-center">
+                    <div class="text-2xl font-extrabold text-teal-400 neon-glow font-mono">5+</div>
+                    <div class="text-xs text-slate-400 font-medium uppercase mt-1">Servers Managed</div>
+                </div>
+                <div class="glass-card p-4 rounded-2xl text-center">
+                    <div class="text-2xl font-extrabold text-cyan-400 neon-glow font-mono">2</div>
+                    <div class="text-xs text-slate-400 font-medium uppercase mt-1">Projects Tested</div>
+                </div>
+                <div class="glass-card p-4 rounded-2xl text-center col-span-2 md:col-span-1">
+                    <div class="text-2xl font-extrabold text-pink-400 font-mono">10+</div>
+                    <div class="text-xs text-slate-400 font-medium uppercase mt-1">Testers Managed</div>
+                </div>
+            </div>
+
+            <!-- Featured Bot Announcement Banner -->
+            <div class="glass-panel rounded-3xl p-6 md:p-8 relative overflow-hidden border border-teal-500/30">
+                <div class="absolute -right-12 -top-12 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="space-y-3 max-w-2xl">
+                        <div class="flex items-center gap-2">
+                            <span class="px-3 py-1 rounded-full text-xs font-mono font-bold badge-cyan uppercase tracking-wider">In Development</span>
+                            <span class="text-xs text-slate-400"><i class="fas fa-server text-teal-400 mr-1"></i> Custom Infrastructure</span>
+                        </div>
+                        <h1 class="text-2xl md:text-4xl font-extrabold text-white tracking-tight">
+                            Building a Separate <span class="text-teal-400">All-In-One Bot</span>
+                        </h1>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Currently working on a brand new, separate Discord bot project. Built for high-volume community servers, seamless automated workflows, and advanced server management.
+                        </p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                        <button onclick="switchSection('bots')" class="px-6 py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-teal-500/25 text-center">
+                            Explore Systems
+                        </button>
+                        <a href="https://discord.com/users/813355382960553994" target="_blank" class="px-6 py-3 rounded-xl glass-card hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider transition text-center border border-slate-700">
+                            DM To Negotiate
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Carousel / Project Cards Showcase -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-gamepad text-teal-400"></i>
+                            Projects Tested or Moderated
+                        </h2>
+                        <p class="text-xs text-slate-400">Games and communities where I contribute as an Administrator or QA Tester</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="scrollProjects(-1)" class="w-8 h-8 rounded-lg glass-card flex items-center justify-center hover:bg-teal-500/20 text-slate-300">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button onclick="scrollProjects(1)" class="w-8 h-8 rounded-lg glass-card flex items-center justify-center hover:bg-teal-500/20 text-slate-300">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="project-scroll-container" class="flex gap-4 overflow-x-auto pb-4 pt-1 snap-x no-scrollbar">
+                    
+                    <!-- Strikeout Arena Card -->
+                    <div class="min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-start border-teal-500/30">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-cyan">TESTER</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">INCOMING GAME</span>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-red-500 flex items-center justify-center text-white font-bold text-xl mb-3 shadow-md">
+                                <i class="fas fa-baseball"></i>
+                            </div>
+                            <h3 class="font-bold text-lg text-white">Strikeout Arena</h3>
+                            <p class="text-xs text-slate-400 mt-1">Action game. I'm a tester for Strikeout Arena as well.</p>
+                            <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-teal-300">Tester</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-cyan-300">QA Team</span>
+                            </div>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                            <span class="text-[11px] text-slate-400">Status: Active</span>
+                            <span class="text-xs text-teal-400 font-bold"><i class="fas fa-check-circle"></i> QA Team</span>
+                        </div>
+                    </div>
+
+                    <!-- Sora Piece Card -->
+                    <div class="min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-start">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-purple">TESTER</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">ACTIVE</span>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-xl mb-3 shadow-md">
+                                <i class="fas fa-ship"></i>
+                            </div>
+                            <h3 class="font-bold text-lg text-white">Sora Piece</h3>
+                            <p class="text-xs text-slate-400 mt-1">Anime RPG Roblox Title.</p>
+                            <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-purple-300">Tester</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-teal-300">T-Mod</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-cyan-300">QA Team</span>
+                            </div>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                            <span class="text-[11px] text-slate-400">Quality Assurance</span>
+                            <span class="text-xs text-slate-300"><i class="fas fa-shield-alt text-indigo-400"></i> QA Team</span>
+                        </div>
+                    </div>
+
+                    <!-- Rogue Requiem Card -->
+                    <div class="min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-start">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-pink">ADMINISTRATOR</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">INCOMING</span>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-white font-bold text-xl mb-3 shadow-md">
+                                <i class="fas fa-skull"></i>
+                            </div>
+                            <h3 class="font-bold text-lg text-white">Rogue Requiem</h3>
+                            <p class="text-xs text-slate-400 mt-1">Needs to be filled in</p>
+                            <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-pink-300">Administrator</span>
+                            </div>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                            <span class="text-[11px] text-slate-400">Admin</span>
+                            <span class="text-xs text-pink-400 font-bold"><i class="fas fa-crown"></i> Admin</span>
+                        </div>
+                    </div>
+
+                    <!-- Arcade Games Bot Card -->
+                    <div class="min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-start border-cyan-500/30">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-cyan">BOT DEV</span>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-teal-400 flex items-center justify-center text-slate-950 font-bold text-xl mb-3 shadow-md">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <h3 class="font-bold text-lg text-white">Arcade Games Bot</h3>
+                            <p class="text-xs text-slate-400 mt-1">Fun minigames for servers. Zero economy, 100% compliant with Discord TOS (No gambling).</p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                            <span class="text-[11px] text-slate-400">Pure Fun Minigames</span>
+                            <button onclick="switchSection('bots')" class="text-xs text-cyan-400 hover:underline font-bold">Details &rarr;</button>
+                        </div>
+                    </div>
+
+                    <!-- Dev Community Server -->
+                    <div class="min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-start">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-purple">CREATOR</span>
+                                <a href="https://discord.gg/uXcsxvMVdr" target="_blank" class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-teal-400 hover:bg-slate-700 transition">JOIN DISCORD</a>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-slate-700 to-slate-900 flex items-center justify-center text-teal-400 font-bold text-xl mb-3 shadow-md border border-slate-700">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3 class="font-bold text-lg text-white">Portfolio Server</h3>
+                            <p class="text-xs text-slate-400 mt-1">My central hub for development, bot demonstrations, and community connection.</p>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                            <span class="text-[11px] text-slate-400">Community Hub</span>
+                            <a href="https://discord.gg/uXcsxvMVdr" target="_blank" class="text-xs text-purple-400 font-bold hover:underline">View Portfolio</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ================= WORK SECTION ================= -->
+        <section id="section-work" class="hidden space-y-6">
+            <div class="border-b border-slate-800 pb-4">
+                <h2 class="text-2xl font-bold text-white">Selected Works & Portfolio</h2>
+                <p class="text-xs text-slate-400">A comprehensive list of game communities, bot projects, and QA deployments managed by Nene.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Strikeout Arena -->
+                <div class="glass-card p-5 rounded-2xl border-l-4 border-l-teal-400">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-white text-base">Strikeout Arena</h3>
+                        <span class="badge-cyan text-[10px] px-2 py-0.5 rounded font-bold">TESTER</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">Action game. I am a tester and QA Team member for Strikeout Arena as well.</p>
+                </div>
+
+                <!-- Sora Piece -->
+                <div class="glass-card p-5 rounded-2xl border-l-4 border-l-indigo-400">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-white text-base">Sora Piece</h3>
+                        <span class="badge-purple text-[10px] px-2 py-0.5 rounded font-bold">QA TEAM & T-MOD</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">Anime Roblox project. Active Tester, T-Mod, and QA Team member ensuring player feedback is categorized for developers.</p>
+                </div>
+
+                <!-- Rogue Requiem -->
+                <div class="glass-card p-5 rounded-2xl border-l-4 border-l-pink-400">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-white text-base">Rogue Requiem</h3>
+                        <span class="badge-pink text-[10px] px-2 py-0.5 rounded font-bold">ADMINISTRATOR</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">Needs to be filled in.</p>
+                </div>
+
+                <!-- Arcade Bot -->
+                <div class="glass-card p-5 rounded-2xl border-l-4 border-l-cyan-400">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-white text-base">Arcade Games Bot</h3>
+                        <span class="badge-cyan text-[10px] px-2 py-0.5 rounded font-bold">DISCORD BOT</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">Custom arcade bot built for casual fun with mini-games. Complete with strict Terms of Service (No real-money gambling) & Privacy Policy.</p>
+                </div>
+
+                <!-- Custom Bot Commisions -->
+                <div class="glass-card p-5 rounded-2xl border-l-4 border-l-amber-400">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-white text-base">Custom Bot Works</h3>
+                        <span class="text-amber-300 bg-amber-500/10 border border-amber-500/30 text-[10px] px-2 py-0.5 rounded font-bold">CUSTOM</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">Tailor-made Discord bots created for specific Roblox game servers and community management infrastructure.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TESTER SECTION ================= -->
+        <section id="section-tester" class="hidden space-y-8">
+            <div class="border-b border-slate-800 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-search text-teal-400"></i>
+                        Testing & Quality Assurance
+                    </h2>
+                    <p class="text-xs text-slate-400">I'm new to all of this, but I ensure I give visual proof and try my best to provide a clear method to replicate any issues found.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- QA Protocol -->
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <h3 class="text-lg font-bold text-white border-b border-slate-800 pb-2">QA Testing Protocol</h3>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <span class="w-7 h-7 rounded-lg bg-teal-500/20 text-teal-300 font-mono font-bold text-xs flex items-center justify-center shrink-0">01</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Visual Proof</h4>
+                                <p class="text-[11px] text-slate-400">Gives visual proof of the issue found.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <span class="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-300 font-mono font-bold text-xs flex items-center justify-center shrink-0">02</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Detailed Explanation</h4>
+                                <p class="text-[11px] text-slate-400">Provides a detailed explanation of the expected versus actual behavior.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-300 font-mono font-bold text-xs flex items-center justify-center shrink-0">03</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Replication Methods</h4>
+                                <p class="text-[11px] text-slate-400">Gives methods to replicate the issue if I know them.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl flex items-center justify-center border border-teal-500/20">
+                    <div class="text-center space-y-3">
+                        <div class="w-16 h-16 mx-auto bg-teal-500/10 rounded-full flex items-center justify-center text-teal-400 text-2xl">
+                            <i class="fas fa-shield-check"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">Commitment to Quality</h3>
+                        <p class="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+                            My focus is on providing actionable, well-documented feedback to developers. Finding the core of an issue and providing reliable reproduction steps is my top priority when acting as QA.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= MODERATOR SECTION ================= -->
+        <section id="section-moderator" class="hidden space-y-8">
+            <div class="border-b border-slate-800 pb-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-shield-halved text-cyan-400"></i>
+                    Moderation & Community Management
+                </h2>
+                <p class="text-xs text-slate-400">Fostering active, welcoming, and properly managed environments for gaming communities.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Moderation Philosophy -->
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <h3 class="text-base font-bold text-white border-b border-slate-800 pb-2">Community Foundations</h3>
+                    <ul class="space-y-3 text-xs text-slate-300">
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-asterisk text-teal-400"></i>
+                            <span>Prioritizing member safety while keeping the community highly engaging.</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-asterisk text-teal-400"></i>
+                            <span>Skilled in resolving conflicts peacefully without immediate escalation.</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-asterisk text-teal-400"></i>
+                            <span>Extensive knowledge of standard Discord permissions and bot configuration.</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-asterisk text-teal-400"></i>
+                            <span>Ensuring strict adherence to Discord's TOS and server-specific rules.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Moderation Style -->
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <h3 class="text-base font-bold text-white border-b border-slate-800 pb-2">My Approach</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <div class="text-teal-400 font-bold mb-1"><i class="fas fa-comments mr-1"></i> Communication First</div>
+                            <p class="text-[11px] text-slate-400">Relying on warnings and conversation before applying harsh punishments.</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <div class="text-cyan-400 font-bold mb-1"><i class="fas fa-clipboard-list mr-1"></i> Consistent Policy</div>
+                            <p class="text-[11px] text-slate-400">Applying the rules fairly to all members regardless of server status or rank.</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <div class="text-indigo-400 font-bold mb-1"><i class="fas fa-folder-open mr-1"></i> Organized Logging</div>
+                            <p class="text-[11px] text-slate-400">Maintaining clean moderation histories and ticket logs for team review.</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <div class="text-purple-400 font-bold mb-1"><i class="fas fa-bolt mr-1"></i> Agile Response</div>
+                            <p class="text-[11px] text-slate-400">Ready to quickly handle sudden raids, spam bots, or large server events.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= BOTS SECTION ================= -->
+        <section id="section-bots" class="hidden space-y-8">
+            <div class="border-b border-slate-800 pb-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-robot text-teal-400"></i>
+                    Discord Bot Development
+                </h2>
+                <p class="text-xs text-slate-400">Custom discord solutions and automated server systems.</p>
+            </div>
+
+            <!-- Spotlight: Arcade Bot & All In One highlight -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Arcade Games Bot Card -->
+                <div class="glass-card p-6 rounded-2xl border border-cyan-500/30 relative space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center font-bold text-lg">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white text-base">Arcade Games Bot</h3>
+                                <p class="text-[11px] text-teal-400 font-mono">TOS-Compliant</p>
+                            </div>
+                        </div>
+                        <span class="badge-cyan text-[10px] px-2.5 py-1 rounded font-bold">READY</span>
+                    </div>
+
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        A fun arcade bot packed with mini-games designed purely for community entertainment. Zero economy system and strictly no gambling features.
+                    </p>
+
+                    <div class="bg-black/30 backdrop-blur-sm p-4 rounded-xl border border-white/10 space-y-2 text-xs">
+                        <div class="font-bold text-teal-300 flex items-center gap-1.5">
+                            <i class="fas fa-shield-check"></i> Verification & Legal Status:
+                        </div>
+                        <ul class="text-[11px] text-slate-400 space-y-1 list-disc list-inside">
+                            <li><strong class="text-slate-200">No Gambling:</strong> Real-money or currency wagering is explicitly forbidden.</li>
+                            <li><strong class="text-slate-200">Minimal Data Collection:</strong> Only basic IDs used for high scores.</li>
+                            <li><strong class="text-slate-200">Privacy First:</strong> Data is never sold or shared.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Flagship All-In-One Bot -->
+                <div class="glass-card p-6 rounded-2xl border border-teal-500/30 relative space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-300 flex items-center justify-center font-bold text-lg">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white text-base">Separate All-In-One Bot</h3>
+                                <p class="text-[11px] text-teal-400 font-mono">Custom Architecture</p>
+                            </div>
+                        </div>
+                        <span class="badge-purple text-[10px] px-2.5 py-1 rounded font-bold">IN DEVELOPMENT</span>
+                    </div>
+
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Currently developing a standalone, fully-featured management bot intended to centralize server operations without relying on old codebases.
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-2 text-[11px]">
+                        <div class="p-2 rounded bg-slate-900 border border-slate-800 text-slate-300">
+                            <i class="fas fa-check text-teal-400 mr-1"></i> Custom Commands
+                        </div>
+                        <div class="p-2 rounded bg-slate-900 border border-slate-800 text-slate-300">
+                            <i class="fas fa-check text-teal-400 mr-1"></i> Action Logging
+                        </div>
+                        <div class="p-2 rounded bg-slate-900 border border-slate-800 text-slate-300">
+                            <i class="fas fa-check text-teal-400 mr-1"></i> Member Management
+                        </div>
+                        <div class="p-2 rounded bg-slate-900 border border-slate-800 text-slate-300">
+                            <i class="fas fa-check text-teal-400 mr-1"></i> Modular Features
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bot Pricing Showcase -->
+            <div class="glass-card p-8 rounded-3xl text-center max-w-2xl mx-auto border-teal-500/40 mt-8 shadow-lg shadow-teal-500/10">
+                <i class="fas fa-handshake text-3xl text-teal-400 mb-4"></i>
+                <h3 class="text-xl font-bold text-white mb-2">Interested in a Custom Bot?</h3>
+                <p class="text-sm text-slate-300 mb-6 leading-relaxed">
+                    Price depends heavily on server size and the complexity of the bot you require. Whether you need simple moderation tools or complex database integrations, I can help.
+                </p>
+                <a href="https://discord.com/users/813355382960553994" target="_blank" class="inline-block px-8 py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition">
+                    DM Me to Negotiate
+                </a>
+            </div>
+        </section>
+
+        <!-- ================= ABOUT SECTION ================= -->
+        <section id="section-about" class="hidden space-y-8">
+            <div class="border-b border-slate-800 pb-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-user-circle text-teal-400"></i>
+                    About Me
+                </h2>
+                <p class="text-xs text-slate-400">Get to know more about Nene's background and experience.</p>
+            </div>
+
+            <!-- Live Discord Presence Card (powered by the Lanyard API) -->
+            <div id="discord-status-card" class="glass-card rounded-2xl overflow-hidden relative">
+                <div id="discord-card-bg" class="absolute inset-0 bg-cover bg-center"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent"></div>
+                <div class="relative z-10 flex items-center gap-4 p-5">
+                    <div class="relative shrink-0">
+                        <img id="discord-avatar" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231e293b'%3E%3Ccircle cx='12' cy='12' r='12'/%3E%3C/svg%3E" alt="Discord avatar" class="w-16 h-16 rounded-full border-2 border-white/20 object-cover">
+                        <span id="discord-status-dot" class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-slate-500"></span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span id="discord-display-name" class="font-extrabold text-white text-lg leading-tight">Loading...</span>
+                            <span id="discord-status-label" class="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold uppercase bg-slate-700 text-slate-300">—</span>
+                        </div>
+                        <span id="discord-username" class="text-xs text-slate-300 font-mono block">@—</span>
+                        <div class="mt-2 marquee-box rounded-lg bg-black/30 border border-white/10 px-2 py-1">
+                            <div id="discord-status-marquee" class="marquee-track">
+                                <span id="discord-status-text" class="text-xs text-slate-200 pr-10">Fetching live status…</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Info Summary -->
+                <div class="glass-card p-6 rounded-2xl md:col-span-2 space-y-4">
+                    <h3 class="text-lg font-bold text-white">Profile Overview</h3>
+                    
+                    <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
+                        <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <i class="fas fa-bolt text-teal-400 text-base mt-0.5"></i>
+                            <div>
+                                <strong class="text-white">Active & Driven:</strong> I pride myself on being highly active within the communities I manage and develop for.
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <i class="fas fa-users text-cyan-400 text-base mt-0.5"></i>
+                            <div>
+                                <strong class="text-white">Leadership & Teamwork:</strong> Capable of directing teams effectively while remaining approachable and communicative with staff.
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                            <i class="fas fa-arrow-up-right-dots text-purple-400 text-base mt-0.5"></i>
+                            <div>
+                                <strong class="text-white">Eager to Learn:</strong> I am relatively new to some of these areas, but I still carry solid experience and constantly strive to improve my development and management skills.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact & Links & Roles (Smaller rectangle boxes) -->
+                <div class="glass-card p-5 rounded-2xl space-y-5">
+                    <div>
+                        <h3 class="text-xs font-bold text-white uppercase font-mono mb-3 tracking-wider">Roles & Experience</h3>
+                        
+                        <!-- Rectangular grid layout for roles -->
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-teal-500/10 border border-teal-500/20 text-teal-300 text-xs">
+                                <i class="fas fa-robot w-4 text-center"></i>
+                                <span class="font-bold text-white">Bot Developer</span>
+                            </div>
+                            <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs">
+                                <i class="fas fa-server w-4 text-center"></i>
+                                <span class="font-bold text-white">Server Manager</span>
+                            </div>
+                            <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs">
+                                <i class="fas fa-microscope w-4 text-center"></i>
+                                <span class="font-bold text-white">QA Team</span>
+                            </div>
+                            <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-300 text-xs">
+                                <i class="fas fa-shield-halved w-4 text-center"></i>
+                                <span class="font-bold text-white">Moderator</span>
+                            </div>
+                            <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs">
+                                <i class="fas fa-palette w-4 text-center"></i>
+                                <span class="font-bold text-white">Concept Artist</span>
+                            </div>
+                            <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs">
+                                <i class="fas fa-scale-balanced w-4 text-center"></i>
+                                <span class="font-bold text-white">Balancer</span>
+                            </div>
+                            <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs">
+                                <i class="fas fa-bug w-4 text-center"></i>
+                                <span class="font-bold text-white">Tester</span>
+                            </div>
+                            <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs">
+                                <i class="fas fa-microphone w-4 text-center"></i>
+                                <span class="font-bold text-white">Event Hoster</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xs font-bold text-white uppercase font-mono mb-3 tracking-wider">Connect With Me</h3>
+                        
+                        <div class="flex flex-col gap-2">
+                            <a href="https://discord.com/users/813355382960553994" target="_blank" class="flex items-center justify-between px-3 py-2.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/20 transition text-indigo-300 group">
+                                <div class="flex items-center gap-2.5 text-xs">
+                                    <i class="fab fa-discord text-sm"></i>
+                                    <span class="font-bold text-white">Discord Profile</span>
+                                </div>
+                                <i class="fas fa-arrow-up-right-from-square text-[10px] text-indigo-400/70"></i>
+                            </a>
+                            
+                            <a href="https://discord.gg/uXcsxvMVdr" target="_blank" class="flex items-center justify-between px-3 py-2.5 rounded-lg bg-teal-500/10 border border-teal-500/20 hover:bg-teal-500/20 transition text-teal-300 group">
+                                <div class="flex items-center gap-2.5 text-xs">
+                                    <i class="fas fa-server text-sm"></i>
+                                    <span class="font-bold text-white">Portfolio Server</span>
+                                </div>
+                                <i class="fas fa-arrow-up-right-from-square text-[10px] text-teal-400/70"></i>
+                            </a>
+
+                            <a href="https://guns.lol/ms.nene" target="_blank" class="flex items-center justify-between px-3 py-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition text-purple-300 group">
+                                <div class="flex items-center gap-2.5 text-xs">
+                                    <i class="fas fa-crosshairs text-sm"></i>
+                                    <span class="font-bold text-white">Guns.lol Profile</span>
+                                </div>
+                                <i class="fas fa-arrow-up-right-from-square text-[10px] text-purple-400/70"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/80 glass-panel py-6 px-4 mt-12 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-300">Nene</span>
+                <span>• Bot Dev & Server Management</span>
+            </div>
+            <div class="text-[11px] text-slate-400">
+                Designed for Game QA, Staff Management & Custom Discord Bots
+            </div>
+        </div>
+    </footer>
+
+    <!-- AUDIO PLAYER ELEMENTS -->
+    <audio id="audio-suzume" preload="auto">
+        <source src="./assets/suzume-theme.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audio-idol" preload="auto">
+        <source src="./assets/idol-theme.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audio-zoro" preload="auto">
+        <source src="./assets/zoro-theme.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // ===================== THEME / AUDIO / VIDEO SYSTEM =====================
+        let isPlaying = false;
+        let currentTrack = 'sky'; // 'sky' (Suzume), 'idol' (Idol - YOASOBI), or 'zoro' (One Piece)
+
+        const audioSuzume = document.getElementById('audio-suzume');
+        const audioIdol = document.getElementById('audio-idol');
+        const audioZoro = document.getElementById('audio-zoro');
+        const audios = { sky: audioSuzume, idol: audioIdol, zoro: audioZoro };
+
+        const musicIcon = document.getElementById('music-icon');
+        const currentTrackLabel = document.getElementById('current-track-name');
+        const bgVideo = document.getElementById('bg-video');
+        const bgVideoZoro = document.getElementById('bg-video-zoro');
+        const bgImageLayer = document.getElementById('bg-image-layer');
+        const volumeSlider = document.getElementById('volume-slider');
+        const volumePopup = document.getElementById('volume-popup');
+        let isVolumeOpen = false;
+
+        const themeParticleColors = {
+            sky: '59, 130, 246',
+            idol: '236, 72, 153',
+            zoro: '34, 197, 94'
+        };
+
+        // Simple three-way rotation: whichever song finishes, move to the next theme in line
+        const themeRotation = { sky: 'idol', idol: 'zoro', zoro: 'sky' };
+
+        // Apply Volume
+        Object.values(audios).forEach(a => a.volume = volumeSlider.value);
+
+        volumeSlider.addEventListener('input', (e) => {
+            const vol = e.target.value;
+            Object.values(audios).forEach(a => a.volume = vol);
+        });
+
+        function toggleVolumeSlider(event) {
+            event.stopPropagation();
+            isVolumeOpen = !isVolumeOpen;
+            if (isVolumeOpen) {
+                volumePopup.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+                volumePopup.classList.add('opacity-100', 'scale-100');
+            } else {
+                volumePopup.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                volumePopup.classList.remove('opacity-100', 'scale-100');
+            }
+        }
+
+        // Close volume popup when clicking outside
+        window.addEventListener('click', (e) => {
+            if (!volumePopup.contains(e.target) && isVolumeOpen) {
+                isVolumeOpen = false;
+                volumePopup.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                volumePopup.classList.remove('opacity-100', 'scale-100');
+            }
+        });
+
+        // When a track finishes, rotate to the next theme (music + background + color skin)
+        audioSuzume.addEventListener('ended', () => switchTheme(themeRotation.sky));
+        audioIdol.addEventListener('ended', () => switchTheme(themeRotation.idol));
+        audioZoro.addEventListener('ended', () => switchTheme(themeRotation.zoro));
+
+        function toggleAudio() {
+            const activeAudio = audios[currentTrack];
+            if (isPlaying) {
+                activeAudio.pause();
+                isPlaying = false;
+                musicIcon.className = 'fas fa-play';
+            } else {
+                activeAudio.play().then(() => {
+                    isPlaying = true;
+                    musicIcon.className = 'fas fa-pause animate-pulse';
+                }).catch(e => {
+                    console.log("Audio play prevented by browser policy", e);
+                });
+            }
+        }
+
+        const themeConfig = {
+            sky:  { label: "Suzume - RADWIMPS",   logo: './assets/logo-sky.png',  logoRound: true  },
+            idol: { label: "Idol - YOASOBI",      logo: './assets/logo-idol.png', logoRound: false },
+            zoro: { label: "The Strongest - One Piece", logo: './assets/logo-zoro.png', logoRound: false }
+        };
+
+        function switchTheme(theme) {
+            Object.values(audios).forEach(a => { a.pause(); a.currentTime = 0; });
+            currentTrack = theme;
+            document.body.dataset.theme = theme;
+
+            const logoWrap = document.getElementById('brand-logo-wrap');
+            const logoImg = document.getElementById('brand-logo-img');
+            const favicon = document.getElementById('favicon');
+            const cfg = themeConfig[theme];
+
+            currentTrackLabel.innerText = cfg.label;
+
+            // Backgrounds: only the active theme's layer is visible, the rest fade to 0
+            bgVideo.style.opacity = (theme === 'sky') ? "0.55" : "0";
+            bgVideoZoro.style.opacity = (theme === 'zoro') ? "0.6" : "0";
+            bgImageLayer.style.opacity = (theme === 'idol') ? "0.7" : "0";
+
+            logoImg.src = cfg.logo;
+            logoWrap.classList.toggle('rounded-full', cfg.logoRound);
+            logoWrap.classList.toggle('rounded-xl', !cfg.logoRound);
+            logoImg.classList.toggle('rounded-full', cfg.logoRound);
+            logoImg.classList.toggle('rounded-xl', !cfg.logoRound);
+            if (favicon) favicon.href = cfg.logo;
+
+            if (isPlaying) {
+                const newAudio = audios[theme];
+                newAudio.play().catch(e => console.log(e));
+                musicIcon.className = 'fas fa-pause animate-pulse';
+            }
+        }
+
+        // Section Switching
+        function switchSection(sectionId) {
+            const sections = ['home', 'work', 'tester', 'moderator', 'bots', 'about'];
+            sections.forEach(sec => {
+                const el = document.getElementById('section-' + sec);
+                const btn = document.getElementById('nav-' + sec);
+                const btnMobile = document.getElementById('nav-' + sec + '-mobile');
+                if (sec === sectionId) {
+                    el.classList.remove('hidden');
+                    if(btn) btn.classList.add('active');
+                    if(btnMobile) btnMobile.classList.add('active');
+                } else {
+                    el.classList.add('hidden');
+                    if(btn) btn.classList.remove('active');
+                    if(btnMobile) btnMobile.classList.remove('active');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Scroll Carousel
+        function scrollProjects(direction) {
+            const container = document.getElementById('project-scroll-container');
+            container.scrollBy({ left: direction * 290, behavior: 'smooth' });
+        }
+
+        // Particle Visualizer Effect on Canvas (color follows the active theme)
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 45; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 0.5,
+                    speedY: Math.random() * 0.4 + 0.1,
+                    opacity: Math.random() * 0.6 + 0.2
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const rgb = themeParticleColors[currentTrack] || themeParticleColors.sky;
+            particles.forEach(p => {
+                ctx.fillStyle = `rgba(${rgb}, ${p.opacity})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                p.y -= p.speedY;
+                if (p.y < 0) {
+                    p.y = canvas.height;
+                    p.x = Math.random() * canvas.width;
+                }
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        function initSite() {
+            resizeCanvas();
+            initParticles();
+            animateParticles();
+
+            // The actual random pick already happened as early as possible
+            // (see the inline script right after the background elements),
+            // to avoid any flash of a default theme. Just finish wiring up
+            // the logo/label/favicon for whichever theme that was. Audio
+            // itself still waits for the click-to-enter overlay below.
+            const startTheme = window.__startTheme || 'sky';
+            switchTheme(startTheme);
+        }
+        initSite();
+
+        window.onresize = resizeCanvas;
+
+        // Starts the moment the overlay is clicked — same click, same instant,
+        // no waiting, no silent autoplay guesswork. The site content rises
+        // into view at the same time the overlay fades away.
+        document.getElementById('start-overlay').addEventListener('click', function startExperience() {
+            const overlay = document.getElementById('start-overlay');
+            overlay.classList.add('overlay-hidden');
+            setTimeout(() => { overlay.style.display = 'none'; }, 650);
+
+            document.body.classList.add('site-revealed');
+
+            // Explicitly (re)trigger the muted videos here too — some browsers
+            // silently fail to honor the autoplay attribute on large video
+            // files, especially while they're still buffering. A direct
+            // .play() call on a real user gesture always works. Both are
+            // muted, so starting the one that's not currently visible is
+            // harmless — it just means it's ready and in sync if the theme
+            // rotates to it later.
+            bgVideo.muted = true;
+            bgVideoZoro.muted = true;
+            bgVideo.play().catch(e => console.log("Sky video play failed:", e));
+            bgVideoZoro.play().catch(e => console.log("Zoro video play failed:", e));
+
+            const audioToPlay = audios[currentTrack];
+            audioToPlay.currentTime = 0;
+            audioToPlay.play().then(() => {
+                isPlaying = true;
+                musicIcon.className = 'fas fa-pause animate-pulse';
+            }).catch(e => console.log("Audio play failed:", e));
+        }, { once: true });
+
+        // ===================== LIVE DISCORD PRESENCE (Lanyard API) =====================
+        // Requires the Discord account below to have joined the Lanyard support
+        // server at least once (discord.gg/lanyard) — that's what lets the
+        // Lanyard API read live presence for a user ID without a bot in your
+        // own server. If it hasn't joined, the card shows a friendly fallback.
+        const DISCORD_USER_ID = "813355382960553994";
+
+        const STATUS_META = {
+            online:  { label: 'Online',         color: '#23a55a' },
+            idle:    { label: 'Idle',           color: '#f0b232' },
+            dnd:     { label: 'Do Not Disturb', color: '#f23f43' },
+            offline: { label: 'Offline',         color: '#80848e' }
+        };
+
+        function setMarqueeText(text) {
+            const track = document.getElementById('discord-status-marquee');
+            const span = document.getElementById('discord-status-text');
+            span.textContent = text;
+            track.classList.remove('marquee-active');
+            track.querySelectorAll('.marquee-clone').forEach(el => el.remove());
+            track.style.animationDuration = '';
+
+            requestAnimationFrame(() => {
+                const containerWidth = track.parentElement.clientWidth;
+                if (span.scrollWidth > containerWidth) {
+                    const clone = span.cloneNode(true);
+                    clone.classList.add('marquee-clone');
+                    track.appendChild(clone);
+                    const duration = Math.max(8, span.scrollWidth / 35);
+                    track.style.animationDuration = duration + 's';
+                    track.classList.add('marquee-active');
+                }
+            });
+        }
+
+        async function fetchDiscordStatus() {
+            try {
+                const res = await fetch(`https://api.lanyard.rest/v1/users/${DISCORD_USER_ID}`);
+                const json = await res.json();
+                if (!json.success) throw new Error('lanyard lookup failed');
+                const d = json.data;
+                const user = d.discord_user;
+
+                const avatarUrl = user.avatar
+                    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`
+                    : `https://cdn.discordapp.com/embed/avatars/0.png`;
+
+                document.getElementById('discord-avatar').src = avatarUrl;
+                document.getElementById('discord-card-bg').style.backgroundImage = `url('${avatarUrl}')`;
+                document.getElementById('discord-display-name').textContent = user.global_name || user.username;
+                document.getElementById('discord-username').textContent = '@' + user.username;
+
+                const meta = STATUS_META[d.discord_status] || STATUS_META.offline;
+                const dot = document.getElementById('discord-status-dot');
+                dot.style.background = meta.color;
+
+                const label = document.getElementById('discord-status-label');
+                label.textContent = meta.label;
+                label.style.background = meta.color + '33';
+                label.style.color = meta.color;
+                label.style.border = `1px solid ${meta.color}88`;
+
+                const customStatus = (d.activities || []).find(a => a.type === 4);
+                const statusText = (customStatus && customStatus.state) ? customStatus.state : 'No custom status set.';
+                setMarqueeText(statusText);
+            } catch (err) {
+                document.getElementById('discord-display-name').textContent = 'Status unavailable';
+                document.getElementById('discord-username').textContent = 'Join discord.gg/lanyard once to enable this';
+                setMarqueeText('Live presence needs the account to have joined the Lanyard support server.');
+            }
+        }
+
+        fetchDiscordStatus();
+        setInterval(fetchDiscordStatus, 20000);
+    </script>
+</body>
+</html>
