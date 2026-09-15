@@ -106,6 +106,15 @@
             background: var(--theme-accent);
         }
 
+        /* No Scrollbar Utility */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
         /* Ambient Canvas & Overlay */
         #bg-canvas {
             position: fixed;
@@ -158,11 +167,7 @@
             border: 1px solid rgba(244, 114, 182, 0.3);
         }
 
-        /* ===== GLOBAL BRAND RESKIN =====
-           These override the Tailwind teal/cyan utility classes used across the
-           markup so the entire page recolors with the active theme. Category
-           badges (purple/pink/indigo/amber/rose/emerald) are left untouched
-           since they carry their own meaning and aren't part of the site skin. */
+        /* ===== GLOBAL BRAND RESKIN ===== */
         .text-teal-400, .text-teal-300 { color: var(--theme-accent) !important; }
         .text-cyan-400, .text-cyan-300 { color: var(--theme-secondary) !important; }
         .border-teal-500\/20, .border-teal-500\/30, .border-teal-500\/40 { border-color: rgba(var(--theme-accent-rgb), 0.3) !important; }
@@ -179,8 +184,6 @@
         .to-cyan-400 { --tw-gradient-to: var(--theme-secondary) !important; }
         ::selection { background-color: var(--theme-accent); color: #06090e; }
 
-        /* Video element full cover, softly blurred per request. Shared by
-           both the sky and zoro video backgrounds. */
         #bg-video, #bg-video-zoro {
             position: fixed;
             top: 50%;
@@ -212,7 +215,6 @@
             transform: scale(1.05);
         }
 
-        /* Volume Slider Customization */
         input[type=range] {
             -webkit-appearance: none;
             background: transparent;
@@ -234,7 +236,6 @@
             border-radius: 2px;
         }
 
-        /* ===== Discord presence card ===== */
         #discord-status-card { min-height: 150px; }
         #discord-card-bg {
             filter: blur(22px) brightness(0.45) saturate(1.2);
@@ -253,14 +254,6 @@
         }
         .marquee-active { animation-name: marquee-scroll; animation-timing-function: linear; animation-iteration-count: infinite; }
 
-        /* ===== Click-to-enter overlay =====
-           Browsers block audio autoplay until a real user gesture happens.
-           This screen IS that gesture — the click both reveals the site and
-           starts the audio in the same instant, so there's no lag and no
-           silent guessing about whether autoplay worked. The background is
-           already loading/playing behind it (muted video, particles, theme
-           colors all set up immediately) — the overlay just sits on top,
-           translucent, so that's visible through it. */
         #start-overlay {
             position: fixed;
             inset: 0;
@@ -296,10 +289,6 @@
             50% { opacity: 0.5; }
         }
 
-        /* ===== Site reveal =====
-           Header, page content, and footer all rise up from below into place
-           the instant the overlay is dismissed, staggered slightly for a
-           smooth cascading entrance rather than a hard cut. */
         header, main, footer {
             opacity: 0;
             transform: translateY(36px);
@@ -308,16 +297,26 @@
         body.site-revealed header { opacity: 1; transform: translateY(0); transition-delay: 0.05s; }
         body.site-revealed main { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
         body.site-revealed footer { opacity: 1; transform: translateY(0); transition-delay: 0.35s; }
+
+        .project-card-item {
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease, filter 0.6s ease;
+            transform: scale(0.88);
+            opacity: 0.65;
+            filter: brightness(0.8);
+        }
+        .project-card-item.carousel-active {
+            transform: scale(1);
+            opacity: 1;
+            filter: brightness(1);
+        }
     </style>
 </head>
 <body data-theme="sky" class="min-h-screen flex flex-col justify-between relative selection:bg-teal-500 selection:text-black">
 
-    <!-- Click-to-enter gate: reveals the site and starts audio in the same click -->
     <div id="start-overlay">
         <span class="click-text">click to enter...</span>
     </div>
 
-    <!-- Background Media Layers -->
     <video id="bg-video" autoplay loop muted playsinline>
         <source src="./assets/sky-bg.mp4" type="video/mp4">
     </video>
@@ -327,10 +326,6 @@
     <div id="bg-image-layer" style="background-image: url('./assets/idol-bg.png');"></div>
 
     <script>
-        // Runs immediately, before the rest of the page even parses, so
-        // there's zero flash of a default theme. Also avoids repeating
-        // whichever theme played last time (stored in localStorage), so a
-        // refresh reliably gives you a different one.
         (function () {
             var themes = ['sky', 'idol', 'zoro'];
             var last = null;
@@ -358,9 +353,7 @@
     <header class="sticky top-0 z-50 px-4 py-3 border-b border-slate-800/80 glass-panel">
         <div class="max-w-7xl mx-auto flex flex-col gap-3">
             
-            <!-- Top Row: Brand & Audio Control Box (Now side by side on laptop) -->
             <div class="flex items-center justify-between gap-4 w-full flex-wrap lg:flex-nowrap">
-                <!-- Brand / Name -->
                 <a href="https://discord.com/users/813355382960553994" target="_blank" class="flex items-center gap-3 cursor-pointer group shrink-0">
                     <div id="brand-logo-wrap" class="w-10 h-10 rounded-full bg-gradient-to-tr from-teal-500 to-cyan-400 p-[2px] shadow-lg shadow-teal-500/20 group-hover:scale-105 transition overflow-hidden">
                         <img id="brand-logo-img" src="./assets/logo-sky.png" alt="Nene" class="w-full h-full object-cover rounded-full">
@@ -374,7 +367,6 @@
                     </div>
                 </a>
 
-                <!-- Navigation Links (Moved up to top row on large screens to sit cleanly alongside Brand & Audio) -->
                 <nav class="hidden lg:flex items-center gap-1 overflow-x-auto py-1 no-scrollbar text-xs font-semibold uppercase tracking-wider justify-center bg-slate-900/40 px-3 py-1.5 rounded-xl border border-slate-800/60">
                     <button onclick="switchSection('home')" id="nav-home" class="nav-btn active px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50">Home</button>
                     <button onclick="switchSection('work')" id="nav-work" class="nav-btn px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50">Work</button>
@@ -387,7 +379,6 @@
                     <button onclick="switchSection('about')" id="nav-about" class="nav-btn px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50">About</button>
                 </nav>
 
-                <!-- Audio Control Box -->
                 <div class="flex items-center gap-2.5 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 relative shrink-0">
                     <button id="music-toggle-btn" onclick="toggleAudio()" class="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-300 flex items-center justify-center hover:bg-teal-500/30 transition" title="Toggle Music">
                         <i id="music-icon" class="fas fa-play"></i>
@@ -404,7 +395,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Collapsible Volume Slider Container -->
                     <div class="relative flex items-center pl-1 border-l border-slate-700/80">
                         <button onclick="toggleVolumeSlider(event)" class="w-7 h-7 rounded-lg text-slate-400 hover:text-teal-300 hover:bg-slate-800 flex items-center justify-center transition" title="Volume">
                             <i class="fas fa-volume-up text-xs"></i>
@@ -418,7 +408,6 @@
                 </div>
             </div>
 
-            <!-- Second Row: Navigation Links (For mobile screens) -->
             <nav class="flex lg:hidden items-center gap-1 overflow-x-auto py-1 no-scrollbar text-xs font-semibold uppercase tracking-wider justify-start border-t border-slate-800/50 pt-2">
                 <button onclick="switchSection('home')" id="nav-home-mobile" class="nav-btn active px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50">Home</button>
                 <button onclick="switchSection('work')" id="nav-work-mobile" class="nav-btn px-3.5 py-1.5 rounded-lg transition text-slate-300 hover:text-white hover:bg-slate-800/50">Work</button>
@@ -440,7 +429,6 @@
         <!-- ================= HOME SECTION ================= -->
         <section id="section-home" class="space-y-10">
             
-            <!-- Hero Stats Bar -->
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                 <div class="glass-card p-4 rounded-2xl text-center">
                     <div class="text-2xl font-extrabold text-teal-400 neon-glow font-mono">5+</div>
@@ -456,7 +444,6 @@
                 </div>
             </div>
 
-            <!-- Featured Bot Announcement Banner -->
             <div class="glass-panel rounded-3xl p-6 md:p-8 relative overflow-hidden border border-teal-500/30">
                 <div class="absolute -right-12 -top-12 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
                 <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
@@ -483,13 +470,12 @@
                 </div>
             </div>
 
-            <!-- Interactive Carousel / Project Cards Showcase -->
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="text-xl font-bold text-white flex items-center gap-2">
                             <i class="fas fa-gamepad text-teal-400"></i>
-                            Projects Tested or Moderated
+                            Projects Tested & Moderated
                         </h2>
                         <p class="text-xs text-slate-400">Games and communities where I contribute as an Administrator or QA Tester</p>
                     </div>
@@ -503,36 +489,36 @@
                     </div>
                 </div>
 
-                <div id="project-scroll-container" class="flex gap-4 overflow-x-auto pb-4 pt-1 snap-x no-scrollbar">
+                <div id="project-scroll-container" class="flex gap-6 overflow-x-auto py-6 px-4 snap-x no-scrollbar items-center scroll-smooth">
                     
                     <!-- Strikeout Arena Card -->
-                    <div class="min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-start border-teal-500/30">
+                    <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-teal-500/30">
                         <div>
                             <div class="flex items-center justify-between mb-3">
-                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-cyan">TESTER</span>
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-cyan">TESTER & QA TEAM</span>
                                 <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">INCOMING GAME</span>
                             </div>
                             <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-red-500 flex items-center justify-center text-white font-bold text-xl mb-3 shadow-md">
                                 <i class="fas fa-baseball"></i>
                             </div>
                             <h3 class="font-bold text-lg text-white">Strikeout Arena</h3>
-                            <p class="text-xs text-slate-400 mt-1">Action game. I'm a tester for Strikeout Arena as well.</p>
+                            <p class="text-xs text-slate-400 mt-1">An Incoming Arena Based Game.</p>
                             <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
-                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-teal-300">Tester</span>
-                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-cyan-300">QA Team</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-teal-300">Lead Tester</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-cyan-300">QA Manager</span>
                             </div>
                         </div>
                         <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
-                            <span class="text-[11px] text-slate-400">Status: Active</span>
-                            <span class="text-xs text-teal-400 font-bold"><i class="fas fa-check-circle"></i> QA Team</span>
+                            <span class="text-[11px] text-slate-400">Status: In Dev</span>
+                            <span class="text-xs text-teal-400 font-bold"><i class="fas fa-check-circle"></i>Tester & QA Team</span>
                         </div>
                     </div>
 
                     <!-- Sora Piece Card -->
-                    <div class="min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-start">
+                    <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center">
                         <div>
                             <div class="flex items-center justify-between mb-3">
-                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-purple">TESTER</span>
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-purple">TESTER & STAFF</span>
                                 <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">ACTIVE</span>
                             </div>
                             <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-xl mb-3 shadow-md">
@@ -547,35 +533,57 @@
                             </div>
                         </div>
                         <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
-                            <span class="text-[11px] text-slate-400">Quality Assurance</span>
-                            <span class="text-xs text-slate-300"><i class="fas fa-shield-alt text-indigo-400"></i> QA Team</span>
+                            <span class="text-[11px] text-slate-400">Status: Released</span>
+                            <span class="text-xs text-slate-300"><i class="fas fa-shield-alt text-indigo-400"></i> QA Team & Staff</span>
+                        </div>
+                    </div>
+
+                    <!-- Legacy Piece Card -->
+                    <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-amber-500/30">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30">T-MOD</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">ACTIVE</span>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-600 to-yellow-500 flex items-center justify-center text-white font-bold text-xl mb-3 shadow-md">
+                                <i class="fas fa-anchor"></i>
+                            </div>
+                            <h3 class="font-bold text-lg text-white">Legacy Piece</h3>
+                            <p class="text-xs text-slate-400 mt-1">An RPG Based Roblox Game</p>
+                            <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-amber-300">T-Mod</span>
+                            </div>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                            <span class="text-[11px] text-slate-400">Status: Released</span>
+                            <span class="text-xs text-amber-400 font-bold"><i class="fas fa-shield-halved"></i> T-Mod</span>
                         </div>
                     </div>
 
                     <!-- Rogue Requiem Card -->
-                    <div class="min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-start">
+                    <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center">
                         <div>
                             <div class="flex items-center justify-between mb-3">
-                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-pink">ADMINISTRATOR</span>
-                                <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">INCOMING</span>
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-pink">ADMINISTRATOR???</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">INCOMING GAME</span>
                             </div>
                             <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-white font-bold text-xl mb-3 shadow-md">
                                 <i class="fas fa-skull"></i>
                             </div>
                             <h3 class="font-bold text-lg text-white">Rogue Requiem</h3>
-                            <p class="text-xs text-slate-400 mt-1">Needs to be filled in</p>
+                            <p class="text-xs text-slate-400 mt-1">In Dev (I have No clue what the game is about)</p>
                             <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
                                 <span class="px-2 py-0.5 rounded bg-slate-800/80 text-pink-300">Administrator</span>
                             </div>
                         </div>
                         <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
-                            <span class="text-[11px] text-slate-400">Admin</span>
+                            <span class="text-[11px] text-slate-400">Status: In Dev</span>
                             <span class="text-xs text-pink-400 font-bold"><i class="fas fa-crown"></i> Admin</span>
                         </div>
                     </div>
 
                     <!-- Arcade Games Bot Card -->
-                    <div class="min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-start border-cyan-500/30">
+                    <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-cyan-500/30">
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-cyan">BOT DEV</span>
@@ -593,7 +601,7 @@
                     </div>
 
                     <!-- Dev Community Server -->
-                    <div class="min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-start">
+                    <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center">
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-purple">CREATOR</span>
@@ -624,16 +632,14 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Strikeout Arena -->
                 <div class="glass-card p-5 rounded-2xl border-l-4 border-l-teal-400">
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="font-bold text-white text-base">Strikeout Arena</h3>
                         <span class="badge-cyan text-[10px] px-2 py-0.5 rounded font-bold">TESTER</span>
                     </div>
-                    <p class="text-xs text-slate-300 leading-relaxed">Action game. I am a tester and QA Team member for Strikeout Arena as well.</p>
+                    <p class="text-xs text-slate-300 leading-relaxed">An Incoming Arena Game. Can't reveal much.</p>
                 </div>
 
-                <!-- Sora Piece -->
                 <div class="glass-card p-5 rounded-2xl border-l-4 border-l-indigo-400">
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="font-bold text-white text-base">Sora Piece</h3>
@@ -642,7 +648,14 @@
                     <p class="text-xs text-slate-300 leading-relaxed">Anime Roblox project. Active Tester, T-Mod, and QA Team member ensuring player feedback is categorized for developers.</p>
                 </div>
 
-                <!-- Rogue Requiem -->
+                <div class="glass-card p-5 rounded-2xl border-l-4 border-l-amber-400">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-white text-base">Legacy Piece</h3>
+                        <span class="text-amber-300 bg-amber-500/10 border border-amber-500/30 text-[10px] px-2 py-0.5 rounded font-bold">T-MOD & TESTER</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">Roblox game community. Contributing as an active Trial Moderator and Tester.</p>
+                </div>
+
                 <div class="glass-card p-5 rounded-2xl border-l-4 border-l-pink-400">
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="font-bold text-white text-base">Rogue Requiem</h3>
@@ -651,7 +664,6 @@
                     <p class="text-xs text-slate-300 leading-relaxed">Needs to be filled in.</p>
                 </div>
 
-                <!-- Arcade Bot -->
                 <div class="glass-card p-5 rounded-2xl border-l-4 border-l-cyan-400">
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="font-bold text-white text-base">Arcade Games Bot</h3>
@@ -660,7 +672,6 @@
                     <p class="text-xs text-slate-300 leading-relaxed">Custom arcade bot built for casual fun with mini-games. Complete with strict Terms of Service (No real-money gambling) & Privacy Policy.</p>
                 </div>
 
-                <!-- Custom Bot Commisions -->
                 <div class="glass-card p-5 rounded-2xl border-l-4 border-l-amber-400">
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="font-bold text-white text-base">Custom Bot Works</h3>
@@ -684,7 +695,6 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- QA Protocol -->
                 <div class="glass-card p-6 rounded-2xl space-y-4">
                     <h3 class="text-lg font-bold text-white border-b border-slate-800 pb-2">QA Testing Protocol</h3>
                     
@@ -740,7 +750,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Moderation Philosophy -->
                 <div class="glass-card p-6 rounded-2xl space-y-4">
                     <h3 class="text-base font-bold text-white border-b border-slate-800 pb-2">Community Foundations</h3>
                     <ul class="space-y-3 text-xs text-slate-300">
@@ -763,7 +772,6 @@
                     </ul>
                 </div>
 
-                <!-- Moderation Style -->
                 <div class="glass-card p-6 rounded-2xl space-y-4">
                     <h3 class="text-base font-bold text-white border-b border-slate-800 pb-2">My Approach</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -798,9 +806,7 @@
                 <p class="text-xs text-slate-400">Custom discord solutions and automated server systems.</p>
             </div>
 
-            <!-- Spotlight: Arcade Bot & All In One highlight -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Arcade Games Bot Card -->
                 <div class="glass-card p-6 rounded-2xl border border-cyan-500/30 relative space-y-4">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
@@ -831,7 +837,6 @@
                     </div>
                 </div>
 
-                <!-- Flagship All-In-One Bot -->
                 <div class="glass-card p-6 rounded-2xl border border-teal-500/30 relative space-y-4">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
@@ -867,7 +872,6 @@
                 </div>
             </div>
 
-            <!-- Bot Pricing Showcase -->
             <div class="glass-card p-8 rounded-3xl text-center max-w-2xl mx-auto border-teal-500/40 mt-8 shadow-lg shadow-teal-500/10">
                 <i class="fas fa-handshake text-3xl text-teal-400 mb-4"></i>
                 <h3 class="text-xl font-bold text-white mb-2">Interested in a Custom Bot?</h3>
@@ -890,7 +894,6 @@
                 <p class="text-xs text-slate-400">Get to know more about Nene's background and experience.</p>
             </div>
 
-            <!-- Live Discord Presence Card (powered by the Lanyard API) -->
             <div id="discord-status-card" class="glass-card rounded-2xl overflow-hidden relative">
                 <div id="discord-card-bg" class="absolute inset-0 bg-cover bg-center"></div>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent"></div>
@@ -915,7 +918,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Info Summary -->
                 <div class="glass-card p-6 rounded-2xl md:col-span-2 space-y-4">
                     <h3 class="text-lg font-bold text-white">Profile Overview</h3>
                     
@@ -943,12 +945,10 @@
                     </div>
                 </div>
 
-                <!-- Contact & Links & Roles (Smaller rectangle boxes) -->
                 <div class="glass-card p-5 rounded-2xl space-y-5">
                     <div>
                         <h3 class="text-xs font-bold text-white uppercase font-mono mb-3 tracking-wider">Roles & Experience</h3>
                         
-                        <!-- Rectangular grid layout for roles -->
                         <div class="flex flex-col gap-2">
                             <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-teal-500/10 border border-teal-500/20 text-teal-300 text-xs">
                                 <i class="fas fa-robot w-4 text-center"></i>
@@ -1045,9 +1045,8 @@
     </audio>
 
     <script>
-        // ===================== THEME / AUDIO / VIDEO SYSTEM =====================
         let isPlaying = false;
-        let currentTrack = 'sky'; // 'sky' (Suzume), 'idol' (Idol - YOASOBI), or 'zoro' (One Piece)
+        let currentTrack = 'sky';
 
         const audioSuzume = document.getElementById('audio-suzume');
         const audioIdol = document.getElementById('audio-idol');
@@ -1069,10 +1068,8 @@
             zoro: '34, 197, 94'
         };
 
-        // Simple three-way rotation: whichever song finishes, move to the next theme in line
         const themeRotation = { sky: 'idol', idol: 'zoro', zoro: 'sky' };
 
-        // Apply Volume
         Object.values(audios).forEach(a => a.volume = volumeSlider.value);
 
         volumeSlider.addEventListener('input', (e) => {
@@ -1092,7 +1089,6 @@
             }
         }
 
-        // Close volume popup when clicking outside
         window.addEventListener('click', (e) => {
             if (!volumePopup.contains(e.target) && isVolumeOpen) {
                 isVolumeOpen = false;
@@ -1101,7 +1097,6 @@
             }
         });
 
-        // When a track finishes, rotate to the next theme (music + background + color skin)
         audioSuzume.addEventListener('ended', () => switchTheme(themeRotation.sky));
         audioIdol.addEventListener('ended', () => switchTheme(themeRotation.idol));
         audioZoro.addEventListener('ended', () => switchTheme(themeRotation.zoro));
@@ -1140,7 +1135,6 @@
 
             currentTrackLabel.innerText = cfg.label;
 
-            // Backgrounds: only the active theme's layer is visible, the rest fade to 0
             bgVideo.style.opacity = (theme === 'sky') ? "0.55" : "0";
             bgVideoZoro.style.opacity = (theme === 'zoro') ? "0.6" : "0";
             bgImageLayer.style.opacity = (theme === 'idol') ? "0.7" : "0";
@@ -1159,7 +1153,6 @@
             }
         }
 
-        // Section Switching
         function switchSection(sectionId) {
             const sections = ['home', 'work', 'tester', 'moderator', 'bots', 'about'];
             sections.forEach(sec => {
@@ -1179,13 +1172,118 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Scroll Carousel
-        function scrollProjects(direction) {
-            const container = document.getElementById('project-scroll-container');
-            container.scrollBy({ left: direction * 290, behavior: 'smooth' });
+        const container = document.getElementById('project-scroll-container');
+        let cardWidth = 0;
+        let originalCardCount = 0;
+        let isJumping = false;
+        let autoScrollInterval;
+
+        function setupInfiniteCarousel() {
+            if (!container) return;
+            const originalItems = Array.from(container.children);
+            originalCardCount = originalItems.length;
+            
+            originalItems.forEach(item => {
+                const clone = item.cloneNode(true);
+                container.appendChild(clone);
+            });
+            originalItems.slice().reverse().forEach(item => {
+                const clone = item.cloneNode(true);
+                container.insertBefore(clone, container.firstChild);
+            });
+
+            setTimeout(() => {
+                calculateCardWidth();
+                
+                container.classList.remove('scroll-smooth', 'snap-x');
+                container.scrollLeft = cardWidth * originalCardCount;
+                
+                setTimeout(() => {
+                    container.classList.add('scroll-smooth', 'snap-x');
+                    updateCarouselFocus();
+                    startAutoLoop();
+                }, 50);
+            }, 100);
         }
 
-        // Particle Visualizer Effect on Canvas (color follows the active theme)
+        function calculateCardWidth() {
+            if (!container || container.children.length === 0) return;
+            const style = window.getComputedStyle(container);
+            const gap = parseFloat(style.columnGap) || 24;
+            cardWidth = container.children[0].offsetWidth + gap;
+        }
+
+        function scrollProjects(direction) {
+            if (!container || cardWidth === 0) return;
+            container.scrollBy({ left: direction * cardWidth, behavior: 'smooth' });
+        }
+
+        function updateCarouselFocus() {
+            if (!container || isJumping || cardWidth === 0) return;
+            
+            const cards = Array.from(container.children);
+            const containerCenter = container.getBoundingClientRect().left + container.clientWidth / 2;
+
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const cardCenter = rect.left + rect.width / 2;
+                const distance = Math.abs(containerCenter - cardCenter);
+
+                if (distance < rect.width * 0.6) {
+                    card.classList.add('carousel-active');
+                } else {
+                    card.classList.remove('carousel-active');
+                }
+            });
+
+            const singleSetWidth = cardWidth * originalCardCount;
+            
+            if (container.scrollLeft <= cardWidth) {
+                isJumping = true;
+                container.classList.remove('scroll-smooth', 'snap-x');
+                container.scrollLeft += singleSetWidth;
+                
+                setTimeout(() => {
+                    container.classList.add('scroll-smooth', 'snap-x');
+                    isJumping = false;
+                }, 50);
+            } else if (container.scrollLeft >= container.scrollWidth - container.clientWidth - cardWidth) {
+                isJumping = true;
+                container.classList.remove('scroll-smooth', 'snap-x');
+                container.scrollLeft -= singleSetWidth;
+                
+                setTimeout(() => {
+                    container.classList.add('scroll-smooth', 'snap-x');
+                    isJumping = false;
+                }, 50);
+            }
+        }
+
+        function startAutoLoop() {
+            if (autoScrollInterval) clearInterval(autoScrollInterval);
+            autoScrollInterval = setInterval(() => {
+                if (!isJumping) scrollProjects(1);
+            }, 2500);
+        }
+
+        function stopAutoLoop() {
+            if (autoScrollInterval) clearInterval(autoScrollInterval);
+        }
+
+        if (container) {
+            container.addEventListener('scroll', () => {
+                window.requestAnimationFrame(updateCarouselFocus);
+            });
+            window.addEventListener('resize', () => {
+                calculateCardWidth();
+            });
+            
+            container.addEventListener('mouseenter', stopAutoLoop);
+            container.addEventListener('mouseleave', startAutoLoop);
+            container.addEventListener('touchstart', stopAutoLoop, {passive: true});
+            container.addEventListener('touchend', startAutoLoop);
+        }
+
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -1230,12 +1328,8 @@
             resizeCanvas();
             initParticles();
             animateParticles();
+            setupInfiniteCarousel();
 
-            // The actual random pick already happened as early as possible
-            // (see the inline script right after the background elements),
-            // to avoid any flash of a default theme. Just finish wiring up
-            // the logo/label/favicon for whichever theme that was. Audio
-            // itself still waits for the click-to-enter overlay below.
             const startTheme = window.__startTheme || 'sky';
             switchTheme(startTheme);
         }
@@ -1243,9 +1337,6 @@
 
         window.onresize = resizeCanvas;
 
-        // Starts the moment the overlay is clicked — same click, same instant,
-        // no waiting, no silent autoplay guesswork. The site content rises
-        // into view at the same time the overlay fades away.
         document.getElementById('start-overlay').addEventListener('click', function startExperience() {
             const overlay = document.getElementById('start-overlay');
             overlay.classList.add('overlay-hidden');
@@ -1253,13 +1344,6 @@
 
             document.body.classList.add('site-revealed');
 
-            // Explicitly (re)trigger the muted videos here too — some browsers
-            // silently fail to honor the autoplay attribute on large video
-            // files, especially while they're still buffering. A direct
-            // .play() call on a real user gesture always works. Both are
-            // muted, so starting the one that's not currently visible is
-            // harmless — it just means it's ready and in sync if the theme
-            // rotates to it later.
             bgVideo.muted = true;
             bgVideoZoro.muted = true;
             bgVideo.play().catch(e => console.log("Sky video play failed:", e));
@@ -1273,11 +1357,6 @@
             }).catch(e => console.log("Audio play failed:", e));
         }, { once: true });
 
-        // ===================== LIVE DISCORD PRESENCE (Lanyard API) =====================
-        // Requires the Discord account below to have joined the Lanyard support
-        // server at least once (discord.gg/lanyard) — that's what lets the
-        // Lanyard API read live presence for a user ID without a bot in your
-        // own server. If it hasn't joined, the card shows a friendly fallback.
         const DISCORD_USER_ID = "813355382960553994";
 
         const STATUS_META = {
