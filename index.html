@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nene | Bot Dev & Server Management</title>
     <link id="favicon" rel="icon" type="image/png" href="./assets/logo-sky.png">
-   
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-   
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -41,8 +38,6 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             overflow-x: hidden;
         }
-
-       
         body[data-theme="sky"] {
             --theme-accent: #3b82f6;
             --theme-accent-rgb: 59, 130, 246;
@@ -61,8 +56,13 @@
             --theme-secondary: #84cc16;
             --theme-secondary-rgb: 132, 204, 22;
         }
-
-       
+        body[data-theme="bocchi"] {
+            --theme-accent: #ff7eb6;
+            --theme-accent-rgb: 255, 126, 182;
+            --theme-secondary: #67e8f9;
+            --theme-secondary-rgb: 103, 232, 249;
+        }
+        
         .glass-panel {
             background: rgba(10, 14, 22, 0.32);
             backdrop-filter: blur(9px);
@@ -85,7 +85,6 @@
             box-shadow: 0 12px 28px -8px rgba(var(--theme-accent-rgb), 0.2);
         }
 
-      
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -101,13 +100,12 @@
             background: var(--theme-accent);
         }
 
-
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
         .no-scrollbar {
             -ms-overflow-style: none;  
-            scrollbar-width: none;  
+            scrollbar-width: none; 
         }
 
         #bg-canvas {
@@ -133,14 +131,12 @@
             transition: background 1s ease;
         }
 
-       
         .nav-btn.active {
             color: var(--theme-accent);
             background: rgba(var(--theme-accent-rgb), 0.12);
             border: 1px solid rgba(var(--theme-accent-rgb), 0.3);
         }
 
-       
         .neon-glow {
             text-shadow: 0 0 12px rgba(var(--theme-accent-rgb), 0.5);
         }
@@ -161,7 +157,6 @@
             border: 1px solid rgba(244, 114, 182, 0.3);
         }
 
-   
         .text-teal-400, .text-teal-300 { color: var(--theme-accent) !important; }
         .text-cyan-400, .text-cyan-300 { color: var(--theme-secondary) !important; }
         .border-teal-500\/20, .border-teal-500\/30, .border-teal-500\/40 { border-color: rgba(var(--theme-accent-rgb), 0.3) !important; }
@@ -178,7 +173,7 @@
         .to-cyan-400 { --tw-gradient-to: var(--theme-secondary) !important; }
         ::selection { background-color: var(--theme-accent); color: #06090e; }
 
-        #bg-video, #bg-video-zoro {
+        #bg-video, #bg-video-zoro, #bg-video-bocchi {
             position: fixed;
             top: 50%;
             left: 50%;
@@ -317,11 +312,14 @@
     <video id="bg-video-zoro" autoplay loop muted playsinline>
         <source src="./assets/zoro-bg.mp4" type="video/mp4">
     </video>
+    <video id="bg-video-bocchi" autoplay loop muted playsinline>
+        <source src="./assets/bocchi-bg.mp4" type="video/mp4">
+    </video>
     <div id="bg-image-layer" style="background-image: url('./assets/idol-bg.png');"></div>
 
     <script>
         (function () {
-            var themes = ['sky', 'idol', 'zoro'];
+            var themes = ['sky', 'idol', 'zoro', 'bocchi'];
             var last = null;
             try { last = localStorage.getItem('nene_last_theme'); } catch (e) {}
             var pool = (last && themes.indexOf(last) !== -1)
@@ -334,16 +332,18 @@
             document.body.dataset.theme = choice;
             var bgVideoEl = document.getElementById('bg-video');
             var bgVideoZoroEl = document.getElementById('bg-video-zoro');
+            var bgVideoBocchiEl = document.getElementById('bg-video-bocchi');
             var bgImageLayerEl = document.getElementById('bg-image-layer');
             if (bgVideoEl) bgVideoEl.style.opacity = (choice === 'sky') ? '0.55' : '0';
             if (bgVideoZoroEl) bgVideoZoroEl.style.opacity = (choice === 'zoro') ? '0.6' : '0';
+            if (bgVideoBocchiEl) bgVideoBocchiEl.style.opacity = (choice === 'bocchi') ? '0.6' : '0';
             if (bgImageLayerEl) bgImageLayerEl.style.opacity = (choice === 'idol') ? '0.7' : '0';
         })();
     </script>
     <canvas id="bg-canvas"></canvas>
     <div class="bg-overlay"></div>
 
-   
+    <!-- MAIN NAVBAR -->
     <header class="sticky top-0 z-50 px-4 py-3 border-b border-slate-800/80 glass-panel">
         <div class="max-w-7xl mx-auto flex flex-col gap-3">
             
@@ -377,7 +377,7 @@
                     <button id="music-toggle-btn" onclick="toggleAudio()" class="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-300 flex items-center justify-center hover:bg-teal-500/30 transition" title="Toggle Music">
                         <i id="music-icon" class="fas fa-play"></i>
                     </button>
-                    <div class="flex flex-col pr-1 w-28">
+                    <div class="flex flex-col pr-1 w-40">
                         <span id="current-track-name" class="text-[10px] text-teal-300 font-mono font-medium truncate">Suzume - RADWIMPS</span>
                         <div class="flex items-center justify-between mt-0.5">
                             <div class="flex items-center gap-1 text-[9px] text-slate-400">
@@ -386,6 +386,8 @@
                                 <button onclick="switchTheme('idol')" class="hover:text-pink-400 cursor-pointer">Idol</button>
                                 <span>•</span>
                                 <button onclick="switchTheme('zoro')" class="hover:text-green-400 cursor-pointer">Zoro</button>
+                                <span>•</span>
+                                <button onclick="switchTheme('bocchi')" class="hover:text-pink-300 cursor-pointer">Bocchi</button>
                             </div>
                         </div>
                     </div>
@@ -417,9 +419,8 @@
         </div>
     </header>
 
-  
     <main class="max-w-7xl mx-auto px-4 py-8 flex-1 w-full">
-      
+
         <section id="section-home" class="space-y-10">
             
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -483,8 +484,8 @@
                 </div>
 
                 <div id="project-scroll-container" class="flex gap-6 overflow-x-auto py-6 px-4 snap-x no-scrollbar items-center scroll-smooth">
+
                     
-                   
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-teal-500/30">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -508,7 +509,7 @@
                         </div>
                     </div>
 
-                   
+                    
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -532,7 +533,7 @@
                         </div>
                     </div>
 
-               
+                    
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-amber-500/30">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -554,7 +555,7 @@
                         </div>
                     </div>
 
-             
+                    
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -576,7 +577,7 @@
                         </div>
                     </div>
 
-                  
+                    
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-purple-500/30">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -599,7 +600,7 @@
                         </div>
                     </div>
 
-              
+                    
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-cyan-500/30">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -617,7 +618,7 @@
                         </div>
                     </div>
 
-                   
+                    
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -678,7 +679,7 @@
                         <h3 class="font-bold text-white text-base">Rogue Requiem</h3>
                         <span class="badge-pink text-[10px] px-2 py-0.5 rounded font-bold">ADMINISTRATOR</span>
                     </div>
-                    <p class="text-xs text-slate-300 leading-relaxed">I legit have no Idea on what this game is about 😭</p>
+                    <p class="text-xs text-slate-300 leading-relaxed">I lwky don't have a clue of whats the game about 😭.</p>
                 </div>
 
                 <div class="glass-card p-5 rounded-2xl border-l-4 border-l-purple-400">
@@ -764,6 +765,7 @@
             </div>
         </section>
 
+    
         <section id="section-moderator" class="hidden space-y-8">
             <div class="border-b border-slate-800 pb-4">
                 <h2 class="text-2xl font-bold text-white flex items-center gap-2">
@@ -820,7 +822,7 @@
             </div>
         </section>
 
-
+    
         <section id="section-bots" class="hidden space-y-8">
             <div class="border-b border-slate-800 pb-4">
                 <h2 class="text-2xl font-bold text-white flex items-center gap-2">
@@ -908,7 +910,7 @@
             </div>
         </section>
 
-        
+    
         <section id="section-about" class="hidden space-y-8">
             <div class="border-b border-slate-800 pb-4">
                 <h2 class="text-2xl font-bold text-white flex items-center gap-2">
@@ -1044,7 +1046,7 @@
 
     </main>
 
-   
+
     <footer class="border-t border-slate-800/80 glass-panel py-6 px-4 mt-12 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-2">
@@ -1067,6 +1069,9 @@
     <audio id="audio-zoro" preload="auto">
         <source src="./assets/zoro-theme.mp3" type="audio/mpeg">
     </audio>
+    <audio id="audio-bocchi" preload="auto">
+        <source src="./assets/bocchi-theme.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
         let isPlaying = false;
@@ -1075,12 +1080,14 @@
         const audioSuzume = document.getElementById('audio-suzume');
         const audioIdol = document.getElementById('audio-idol');
         const audioZoro = document.getElementById('audio-zoro');
-        const audios = { sky: audioSuzume, idol: audioIdol, zoro: audioZoro };
+        const audioBocchi = document.getElementById('audio-bocchi');
+        const audios = { sky: audioSuzume, idol: audioIdol, zoro: audioZoro, bocchi: audioBocchi };
 
         const musicIcon = document.getElementById('music-icon');
         const currentTrackLabel = document.getElementById('current-track-name');
         const bgVideo = document.getElementById('bg-video');
         const bgVideoZoro = document.getElementById('bg-video-zoro');
+        const bgVideoBocchi = document.getElementById('bg-video-bocchi');
         const bgImageLayer = document.getElementById('bg-image-layer');
         const volumeSlider = document.getElementById('volume-slider');
         const volumePopup = document.getElementById('volume-popup');
@@ -1089,10 +1096,11 @@
         const themeParticleColors = {
             sky: '59, 130, 246',
             idol: '236, 72, 153',
-            zoro: '34, 197, 94'
+            zoro: '34, 197, 94',
+            bocchi: '255, 126, 182'
         };
 
-        const themeRotation = { sky: 'idol', idol: 'zoro', zoro: 'sky' };
+        const themeRotation = { sky: 'idol', idol: 'zoro', zoro: 'bocchi', bocchi: 'sky' };
 
         Object.values(audios).forEach(a => a.volume = volumeSlider.value);
 
@@ -1124,6 +1132,7 @@
         audioSuzume.addEventListener('ended', () => switchTheme(themeRotation.sky));
         audioIdol.addEventListener('ended', () => switchTheme(themeRotation.idol));
         audioZoro.addEventListener('ended', () => switchTheme(themeRotation.zoro));
+        audioBocchi.addEventListener('ended', () => switchTheme(themeRotation.bocchi));
 
         function toggleAudio() {
             const activeAudio = audios[currentTrack];
@@ -1142,9 +1151,10 @@
         }
 
         const themeConfig = {
-            sky:  { label: "Suzume - RADWIMPS",   logo: './assets/logo-sky.png',  logoRound: true  },
-            idol: { label: "Idol - YOASOBI",      logo: './assets/logo-idol.png', logoRound: false },
-            zoro: { label: "The Strongest - One Piece", logo: './assets/logo-zoro.png', logoRound: false }
+            sky:    { label: "Suzume - RADWIMPS",   logo: './assets/logo-sky.png',    logoRound: true  },
+            idol:   { label: "Idol - YOASOBI",      logo: './assets/logo-idol.png',   logoRound: false },
+            zoro:   { label: "The Strongest - One Piece", logo: './assets/logo-zoro.png', logoRound: false },
+            bocchi: { label: "Never Forget - Bossa Nova", logo: './assets/logo-bocchi.png', logoRound: true }
         };
 
         function switchTheme(theme) {
@@ -1161,6 +1171,7 @@
 
             bgVideo.style.opacity = (theme === 'sky') ? "0.55" : "0";
             bgVideoZoro.style.opacity = (theme === 'zoro') ? "0.6" : "0";
+            bgVideoBocchi.style.opacity = (theme === 'bocchi') ? "0.6" : "0";
             bgImageLayer.style.opacity = (theme === 'idol') ? "0.7" : "0";
 
             logoImg.src = cfg.logo;
@@ -1370,8 +1381,10 @@
 
             bgVideo.muted = true;
             bgVideoZoro.muted = true;
+            bgVideoBocchi.muted = true;
             bgVideo.play().catch(e => console.log("Sky video play failed:", e));
             bgVideoZoro.play().catch(e => console.log("Zoro video play failed:", e));
+            bgVideoBocchi.play().catch(e => console.log("Bocchi video play failed:", e));
 
             const audioToPlay = audios[currentTrack];
             audioToPlay.currentTime = 0;
