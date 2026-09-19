@@ -319,14 +319,11 @@
 
     <script>
         (function () {
+            // Random starting theme. Once running, the theme always advances
+            // in the fixed sequence Blue -> Idol -> Bocchi -> Zoro -> Blue
+            // (see themeRotation further down), no matter where it started.
             var themes = ['sky', 'idol', 'zoro', 'bocchi'];
-            var last = null;
-            try { last = localStorage.getItem('nene_last_theme'); } catch (e) {}
-            var pool = (last && themes.indexOf(last) !== -1)
-                ? themes.filter(function (t) { return t !== last; })
-                : themes;
-            var choice = pool[Math.floor(Math.random() * pool.length)];
-            try { localStorage.setItem('nene_last_theme', choice); } catch (e) {}
+            var choice = themes[Math.floor(Math.random() * themes.length)];
             window.__startTheme = choice;
 
             document.body.dataset.theme = choice;
@@ -1083,6 +1080,55 @@
         const audioBocchi = document.getElementById('audio-bocchi');
         const audios = { sky: audioSuzume, idol: audioIdol, zoro: audioZoro, bocchi: audioBocchi };
 
+        // Log load errors per-track so a silent failure (e.g. a track that
+        // never starts) shows up in the console instead of just doing nothing.
+        Object.entries(audios).forEach(([name, el]) => {
+            el.addEventListener('error', () => {
+                console.error('Audio failed to load for theme "' + name + '":', el.error);
+            });
+        });
+
+        // Monotonically increasing token used to guard against race conditions:
+        // if the theme changes again before a previous play() attempt finished
+        // (or before the file had buffered enough to play), the stale attempt
+        // is discarded instead of fighting with the new one. This is what was
+        // causing playback to randomly stop, and Bocchi's track (often not
+        // preloaded yet the first time it's selected) to silently fail to start.
+        let playRequestId = 0;
+
+        function playTrack(theme) {
+            const myRequestId = ++playRequestId;
+            const audio = audios[theme];
+
+            const attemptPlay = () => {
+                if (myRequestId !== playRequestId) return; // superseded by a newer request
+                audio.play().then(() => {
+                    if (myRequestId !== playRequestId) return;
+                    isPlaying = true;
+                    musicIcon.className = 'fas fa-pause animate-pulse';
+                }).catch(err => {
+                    if (myRequestId !== playRequestId) return;
+                    console.log('Playback failed for theme "' + theme + '":', err);
+                    isPlaying = false;
+                    musicIcon.className = 'fas fa-play';
+                });
+            };
+
+            // readyState >= 3 (HAVE_FUTURE_DATA) means it can start playing now.
+            // Otherwise wait for the browser to buffer enough, so play() isn't
+            // fired on a track that isn't actually ready yet.
+            if (audio.readyState >= 3) {
+                attemptPlay();
+            } else {
+                const onReady = () => {
+                    audio.removeEventListener('canplay', onReady);
+                    attemptPlay();
+                };
+                audio.addEventListener('canplay', onReady);
+                audio.load();
+            }
+        }
+
         const musicIcon = document.getElementById('music-icon');
         const currentTrackLabel = document.getElementById('current-track-name');
         const bgVideo = document.getElementById('bg-video');
@@ -1100,7 +1146,8 @@
             bocchi: '255, 126, 182'
         };
 
-        const themeRotation = { sky: 'idol', idol: 'zoro', zoro: 'bocchi', bocchi: 'sky' };
+        // Fixed playback order: Blue (Sky) -> Idol (Ai Hoshino) -> Bocchi -> Zoro -> back to Blue
+        const themeRotation = { sky: 'idol', idol: 'bocchi', bocchi: 'zoro', zoro: 'sky' };
 
         Object.values(audios).forEach(a => a.volume = volumeSlider.value);
 
@@ -1135,18 +1182,13 @@
         audioBocchi.addEventListener('ended', () => switchTheme(themeRotation.bocchi));
 
         function toggleAudio() {
-            const activeAudio = audios[currentTrack];
             if (isPlaying) {
-                activeAudio.pause();
+                playRequestId++; // cancel any in-flight play attempt for this track
+                audios[currentTrack].pause();
                 isPlaying = false;
                 musicIcon.className = 'fas fa-play';
             } else {
-                activeAudio.play().then(() => {
-                    isPlaying = true;
-                    musicIcon.className = 'fas fa-pause animate-pulse';
-                }).catch(e => {
-                    console.log("Audio play prevented by browser policy", e);
-                });
+                playTrack(currentTrack);
             }
         }
 
@@ -1158,6 +1200,7 @@
         };
 
         function switchTheme(theme) {
+            playRequestId++; // invalidate any pending play() attempt from the previous track
             Object.values(audios).forEach(a => { a.pause(); a.currentTime = 0; });
             currentTrack = theme;
             document.body.dataset.theme = theme;
@@ -1182,9 +1225,7 @@
             if (favicon) favicon.href = cfg.logo;
 
             if (isPlaying) {
-                const newAudio = audios[theme];
-                newAudio.play().catch(e => console.log(e));
-                musicIcon.className = 'fas fa-pause animate-pulse';
+                playTrack(theme);
             }
         }
 
@@ -1386,12 +1427,8 @@
             bgVideoZoro.play().catch(e => console.log("Zoro video play failed:", e));
             bgVideoBocchi.play().catch(e => console.log("Bocchi video play failed:", e));
 
-            const audioToPlay = audios[currentTrack];
-            audioToPlay.currentTime = 0;
-            audioToPlay.play().then(() => {
-                isPlaying = true;
-                musicIcon.className = 'fas fa-pause animate-pulse';
-            }).catch(e => console.log("Audio play failed:", e));
+            audios[currentTrack].currentTime = 0;
+            playTrack(currentTrack);
         }, { once: true });
 
         const DISCORD_USER_ID = "813355382960553994";
