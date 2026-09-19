@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nene | Bot Dev & Server Management</title>
     <link id="favicon" rel="icon" type="image/png" href="./assets/logo-sky.png">
-    <!-- Tailwind CSS -->
+   
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
+   
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -42,12 +42,7 @@
             overflow-x: hidden;
         }
 
-        /* ===== THEME VARIABLES =====
-           Three themes drive the entire site skin:
-           - "sky"  -> Blue Archive Plana wallpaper + Suzume theme song (blue)
-           - "idol" -> Ai Hoshino artwork + Idol (YOASOBI) song (pink/purple)
-           - "zoro" -> Emerald Fury Zoro wallpaper + One Piece theme (green)
-           Switching data-theme on <body> reskins every element below. */
+       
         body[data-theme="sky"] {
             --theme-accent: #3b82f6;
             --theme-accent-rgb: 59, 130, 246;
@@ -67,7 +62,7 @@
             --theme-secondary-rgb: 132, 204, 22;
         }
 
-        /* Glassmorphism Styles */
+       
         .glass-panel {
             background: rgba(10, 14, 22, 0.32);
             backdrop-filter: blur(9px);
@@ -90,7 +85,7 @@
             box-shadow: 0 12px 28px -8px rgba(var(--theme-accent-rgb), 0.2);
         }
 
-        /* Custom Scrollbar */
+      
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -106,16 +101,15 @@
             background: var(--theme-accent);
         }
 
-        /* No Scrollbar Utility */
+
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
         .no-scrollbar {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+            -ms-overflow-style: none;  
+            scrollbar-width: none;  
         }
 
-        /* Ambient Canvas & Overlay */
         #bg-canvas {
             position: fixed;
             top: 0;
@@ -139,14 +133,14 @@
             transition: background 1s ease;
         }
 
-        /* Active Tab Highlight */
+       
         .nav-btn.active {
             color: var(--theme-accent);
             background: rgba(var(--theme-accent-rgb), 0.12);
             border: 1px solid rgba(var(--theme-accent-rgb), 0.3);
         }
 
-        /* Glow effects */
+       
         .neon-glow {
             text-shadow: 0 0 12px rgba(var(--theme-accent-rgb), 0.5);
         }
@@ -167,7 +161,7 @@
             border: 1px solid rgba(244, 114, 182, 0.3);
         }
 
-        /* ===== GLOBAL BRAND RESKIN ===== */
+   
         .text-teal-400, .text-teal-300 { color: var(--theme-accent) !important; }
         .text-cyan-400, .text-cyan-300 { color: var(--theme-secondary) !important; }
         .border-teal-500\/20, .border-teal-500\/30, .border-teal-500\/40 { border-color: rgba(var(--theme-accent-rgb), 0.3) !important; }
@@ -349,7 +343,7 @@
     <canvas id="bg-canvas"></canvas>
     <div class="bg-overlay"></div>
 
-    <!-- MAIN NAVBAR -->
+   
     <header class="sticky top-0 z-50 px-4 py-3 border-b border-slate-800/80 glass-panel">
         <div class="max-w-7xl mx-auto flex flex-col gap-3">
             
@@ -423,10 +417,9 @@
         </div>
     </header>
 
-    <!-- CONTENT WRAPPER -->
+  
     <main class="max-w-7xl mx-auto px-4 py-8 flex-1 w-full">
-
-        <!-- ================= HOME SECTION ================= -->
+      
         <section id="section-home" class="space-y-10">
             
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -491,7 +484,7 @@
 
                 <div id="project-scroll-container" class="flex gap-6 overflow-x-auto py-6 px-4 snap-x no-scrollbar items-center scroll-smooth">
                     
-                    <!-- Strikeout Arena Card -->
+                   
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-teal-500/30">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -515,7 +508,7 @@
                         </div>
                     </div>
 
-                    <!-- Sora Piece Card -->
+                   
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -539,7 +532,7 @@
                         </div>
                     </div>
 
-                    <!-- Legacy Piece Card -->
+               
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-amber-500/30">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -561,7 +554,7 @@
                         </div>
                     </div>
 
-                    <!-- Rogue Requiem Card -->
+             
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -583,7 +576,7 @@
                         </div>
                     </div>
 
-                    <!-- Monarch Studio Card -->
+                  
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-purple-500/30">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -606,7 +599,7 @@
                         </div>
                     </div>
 
-                    <!-- Arcade Games Bot Card -->
+              
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-cyan-500/30">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -624,7 +617,7 @@
                         </div>
                     </div>
 
-                    <!-- Dev Community Server -->
+                   
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -648,7 +641,7 @@
 
         </section>
 
-        <!-- ================= WORK SECTION ================= -->
+        
         <section id="section-work" class="hidden space-y-6">
             <div class="border-b border-slate-800 pb-4">
                 <h2 class="text-2xl font-bold text-white">Selected Works & Portfolio</h2>
@@ -685,7 +678,7 @@
                         <h3 class="font-bold text-white text-base">Rogue Requiem</h3>
                         <span class="badge-pink text-[10px] px-2 py-0.5 rounded font-bold">ADMINISTRATOR</span>
                     </div>
-                    <p class="text-xs text-slate-300 leading-relaxed">Needs to be filled in.</p>
+                    <p class="text-xs text-slate-300 leading-relaxed">I legit have no Idea on what this game is about 😭</p>
                 </div>
 
                 <div class="glass-card p-5 rounded-2xl border-l-4 border-l-purple-400">
@@ -714,7 +707,7 @@
             </div>
         </section>
 
-        <!-- ================= TESTER SECTION ================= -->
+        
         <section id="section-tester" class="hidden space-y-8">
             <div class="border-b border-slate-800 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -771,7 +764,6 @@
             </div>
         </section>
 
-        <!-- ================= MODERATOR SECTION ================= -->
         <section id="section-moderator" class="hidden space-y-8">
             <div class="border-b border-slate-800 pb-4">
                 <h2 class="text-2xl font-bold text-white flex items-center gap-2">
@@ -828,7 +820,7 @@
             </div>
         </section>
 
-        <!-- ================= BOTS SECTION ================= -->
+
         <section id="section-bots" class="hidden space-y-8">
             <div class="border-b border-slate-800 pb-4">
                 <h2 class="text-2xl font-bold text-white flex items-center gap-2">
@@ -916,7 +908,7 @@
             </div>
         </section>
 
-        <!-- ================= ABOUT SECTION ================= -->
+        
         <section id="section-about" class="hidden space-y-8">
             <div class="border-b border-slate-800 pb-4">
                 <h2 class="text-2xl font-bold text-white flex items-center gap-2">
@@ -1052,7 +1044,7 @@
 
     </main>
 
-    <!-- FOOTER -->
+   
     <footer class="border-t border-slate-800/80 glass-panel py-6 px-4 mt-12 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-2">
@@ -1065,7 +1057,7 @@
         </div>
     </footer>
 
-    <!-- AUDIO PLAYER ELEMENTS -->
+
     <audio id="audio-suzume" preload="auto">
         <source src="./assets/suzume-theme.mp3" type="audio/mpeg">
     </audio>
