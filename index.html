@@ -298,6 +298,51 @@
             opacity: 1;
             filter: brightness(1);
         }
+
+        /* ---- Game icons + Roblox / Discord link pills ---- */
+        .game-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            background: #0f172a;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+        }
+        .game-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .link-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 10px; margin-top: 10px; }
+        .link-item { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+        .link-stat { font-size: 9px; font-family: 'JetBrains Mono', monospace; color: #94a3b8; padding-left: 2px; }
+        .link-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 9px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1;
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            transition: all 0.2s ease;
+        }
+        .link-pill:hover { transform: translateY(-1px); }
+        .link-pill.rbx { color: #e2e8f0; }
+        .link-pill.rbx:hover { background: rgba(226, 232, 240, 0.15); }
+        .link-pill.dc { color: #a5b4fc; border-color: rgba(129, 140, 248, 0.35); }
+        .link-pill.dc:hover { background: rgba(99, 102, 241, 0.22); }
+        .link-pill .stat { font-weight: 500; opacity: 0.75; font-family: 'JetBrains Mono', monospace; }
+        .rbx-ico {
+            position: relative;
+            width: 11px;
+            height: 11px;
+            border-radius: 2px;
+            background: currentColor;
+            transform: rotate(15deg);
+            flex-shrink: 0;
+        }
+        .rbx-ico::after { content: ''; position: absolute; inset: 3.5px; background: #0a0d14; }
     </style>
 </head>
 <body data-theme="sky" class="min-h-screen flex flex-col justify-between relative selection:bg-teal-500 selection:text-black">
@@ -481,22 +526,24 @@
 
                 <div id="project-scroll-container" class="flex gap-6 overflow-x-auto py-6 px-4 snap-x no-scrollbar items-center scroll-smooth">
 
-                    
+                    <!-- Strikeout Arena -->
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-teal-500/30">
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-cyan">TESTER & QA TEAM</span>
                                 <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">INCOMING GAME</span>
                             </div>
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-red-500 flex items-center justify-center text-white font-bold text-xl mb-3 shadow-md">
-                                <i class="fas fa-baseball"></i>
-                            </div>
+                            <div class="game-icon"><img src="./assets/strikeout-arena.png" alt="Strikeout Arena icon"></div>
                             <h3 class="font-bold text-lg text-white">Strikeout Arena</h3>
                             <p class="text-xs text-slate-400 mt-1">An Incoming Arena Based Game.</p>
                             <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
                                 <span class="px-2 py-0.5 rounded bg-slate-800/80 text-teal-300">Lead Tester</span>
                                 <span class="px-2 py-0.5 rounded bg-slate-800/80 text-cyan-300">QA Manager</span>
                                 <span class="px-2 py-0.5 rounded bg-slate-800/80 text-pink-300">Administrator</span>
+                            </div>
+                            <div class="link-row">
+                                <div class="link-item"><a href="https://www.roblox.com/games/102996892495028/Strikeout-Arena" target="_blank" class="link-pill rbx"><i class="rbx-ico"></i>Roblox</a></div>
+                                <div class="link-item"><a href="https://discord.gg/nugYCuRq6H" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a></div>
                             </div>
                         </div>
                         <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
@@ -505,16 +552,14 @@
                         </div>
                     </div>
 
-                    
+                    <!-- Sora Piece -->
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center">
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-purple">TESTER & STAFF</span>
                                 <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">ACTIVE</span>
                             </div>
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-xl mb-3 shadow-md">
-                                <i class="fas fa-ship"></i>
-                            </div>
+                            <div class="game-icon"><img src="./assets/sora-piece.png" alt="Sora Piece icon"></div>
                             <h3 class="font-bold text-lg text-white">Sora Piece</h3>
                             <p class="text-xs text-slate-400 mt-1">Anime RPG Roblox Title.</p>
                             <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
@@ -523,6 +568,10 @@
                                 <span class="px-2 py-0.5 rounded bg-slate-800/80 text-cyan-300">QA Team</span>
                                 <span class="px-2 py-0.5 rounded bg-slate-800/80 text-amber-300">Artist's Collector</span>
                             </div>
+                            <div class="link-row">
+                                <div class="link-item"><a href="https://www.roblox.com/games/91356007281562/Sora-Piece" target="_blank" class="link-pill rbx"><i class="rbx-ico"></i>Roblox</a><span class="link-stat">571.3k+ visits</span></div>
+                                <div class="link-item"><a href="https://discord.gg/eSE4dxWXw" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a><span class="link-stat">2k+ members</span></div>
+                            </div>
                         </div>
                         <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
                             <span class="text-[11px] text-slate-400">Status: Released</span>
@@ -530,20 +579,22 @@
                         </div>
                     </div>
 
-                    
+                    <!-- Legacy Piece -->
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-amber-500/30">
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <span class="px-2.5 py-1 rounded-md text-[10px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30">T-MOD</span>
                                 <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">ACTIVE</span>
                             </div>
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-600 to-yellow-500 flex items-center justify-center text-white font-bold text-xl mb-3 shadow-md">
-                                <i class="fas fa-anchor"></i>
-                            </div>
+                            <div class="game-icon"><img src="./assets/legacy-piece.png" alt="Legacy Piece icon"></div>
                             <h3 class="font-bold text-lg text-white">Legacy Piece</h3>
                             <p class="text-xs text-slate-400 mt-1">An RPG Based Roblox Game</p>
                             <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
                                 <span class="px-2 py-0.5 rounded bg-slate-800/80 text-amber-300">T-Mod</span>
+                            </div>
+                            <div class="link-row">
+                                <div class="link-item"><a href="https://www.roblox.com/games/111097829542198/Legacy-Piece" target="_blank" class="link-pill rbx"><i class="rbx-ico"></i>Roblox</a><span class="link-stat">23.6M+ visits</span></div>
+                                <div class="link-item"><a href="https://discord.gg/legacypiece" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a><span class="link-stat">87k+ members</span></div>
                             </div>
                         </div>
                         <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
@@ -552,20 +603,21 @@
                         </div>
                     </div>
 
-                    
+                    <!-- Rogue Requiem -->
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center">
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-pink">ADMINISTRATOR???</span>
                                 <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">INCOMING GAME</span>
                             </div>
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-white font-bold text-xl mb-3 shadow-md">
-                                <i class="fas fa-skull"></i>
-                            </div>
+                            <div class="game-icon"><img src="./assets/rogue-requiem.png" alt="Rogue Requiem icon"></div>
                             <h3 class="font-bold text-lg text-white">Rogue Requiem</h3>
                             <p class="text-xs text-slate-400 mt-1">In Dev (I have No clue what the game is about)</p>
                             <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
                                 <span class="px-2 py-0.5 rounded bg-slate-800/80 text-pink-300">Administrator</span>
+                            </div>
+                            <div class="link-row">
+                                <div class="link-item"><a href="https://discord.gg/xsWATVr7Rh" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a></div>
                             </div>
                         </div>
                         <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
@@ -574,16 +626,14 @@
                         </div>
                     </div>
 
-                    
+                    <!-- Monarch Studio -->
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-purple-500/30">
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-purple">STUDIO ADMIN</span>
                                 <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">ROBLOX STUDIO</span>
                             </div>
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-violet-600 to-fuchsia-500 flex items-center justify-center text-white font-bold text-xl mb-3 shadow-md">
-                                <i class="fas fa-chess-king"></i>
-                            </div>
+                            <div class="game-icon"><img src="./assets/monarch-studio.png" alt="Monarch Studio icon"></div>
                             <h3 class="font-bold text-lg text-white">Monarch Studio</h3>
                             <p class="text-xs text-slate-400 mt-1">Roblox development studio and the owner of the game Rogue Requiem.</p>
                             <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
@@ -597,7 +647,7 @@
                         </div>
                     </div>
 
-                    
+                    <!-- Arcade Games Bot -->
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -615,7 +665,7 @@
                         </div>
                     </div>
 
-                    
+                    <!-- Portfolio Server -->
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center">
                         <div>
                             <div class="flex items-center justify-between mb-3">
@@ -634,25 +684,98 @@
                         </div>
                     </div>
 
-                    
+                    <!-- Immortality Incremental -->
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-amber-500/30">
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <span class="px-2.5 py-1 rounded-md text-[10px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30">ADMINISTRATOR</span>
                                 <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">ACTIVE</span>
                             </div>
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center text-slate-950 font-bold text-xl mb-3 shadow-md">
-                                <i class="fas fa-yin-yang"></i>
-                            </div>
+                            <div class="game-icon"><img src="./assets/immortality-incremental.png" alt="Immortality Incremental icon"></div>
                             <h3 class="font-bold text-lg text-white">Immortality Incremental</h3>
                             <p class="text-xs text-slate-400 mt-1">Roblox cultivation clicker — gather Qi, breakthrough realms, reset for permanent power.</p>
                             <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
                                 <span class="px-2 py-0.5 rounded bg-slate-800/80 text-amber-300">Administrator</span>
                             </div>
+                            <div class="link-row">
+                                <div class="link-item"><a href="https://www.roblox.com/games/75317862071711/Immortality-Incremental" target="_blank" class="link-pill rbx"><i class="rbx-ico"></i>Roblox</a><span class="link-stat">37.7M visits</span></div>
+                                <div class="link-item"><a href="https://discord.gg/BJCqxsKKKU" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a><span class="link-stat">27k+ members</span></div>
+                            </div>
                         </div>
                         <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
                             <span class="text-[11px] text-slate-400">Status: Live</span>
                             <span class="text-xs text-amber-400 font-bold"><i class="fas fa-crown"></i> Admin</span>
+                        </div>
+                    </div>
+
+                    <!-- Sailor Piece -->
+                    <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-cyan-500/30">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-cyan">CORRUPTED</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">ERROR?!?!</span>
+                            </div>
+                            <div class="game-icon"><img src="./assets/sailor-piece.png" alt="Sailor Piece icon"></div>
+                            <h3 class="font-bold text-lg text-white">Sailor Piece</h3>
+                            <p class="text-xs text-slate-400 mt-1">Previously part of the team in several roles.(Have Been Corrupted)</p>
+                            <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-teal-300">Former Bot Dev</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-emerald-300">Former Event Hoster</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-indigo-300">Former Balancer</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-amber-300">Former Concept Artist</span>
+                            </div>
+                            <div class="link-row">
+                                <div class="link-item"><a href="https://www.roblox.com/games/77747658251236/Sailor-Piece" target="_blank" class="link-pill rbx"><i class="rbx-ico"></i>Roblox</a><span class="link-stat">1.5B+ visits</span></div>
+                                <div class="link-item"><a href="https://discord.gg/sailorpiece" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a><span class="link-stat">1.1M members</span></div>
+                            </div>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                            <span class="text-[11px] text-slate-400">Status: Released</span>
+                            <span class="text-xs text-teal-400 font-bold"><i class="fas fa-robot"></i> Bot Dev, Events & more</span>
+                        </div>
+                    </div>
+
+                    <!-- Chaos Studios -->
+                    <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-pink-500/30">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-pink">HEAD ADMIN</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">INCOMING GAME</span>
+                            </div>
+                            <div class="game-icon"><img src="./assets/chaos-studios.png" alt="Chaos Studios icon"></div>
+                            <h3 class="font-bold text-lg text-white">Chaos Studios</h3>
+                            <p class="text-xs text-slate-400 mt-1">Working on an incoming game. Can't reveal much yet.</p>
+                            <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-pink-300">Head Admin</span>
+                            </div>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                            <span class="text-[11px] text-slate-400">Status: In Dev</span>
+                            <span class="text-xs text-pink-400 font-bold"><i class="fas fa-crown"></i> Head Admin</span>
+                        </div>
+                    </div>
+
+                    <!-- Arcane Universe -->
+                    <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-purple-500/30">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-purple">SERVER MANAGER & TESTER</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">INCOMING GAME</span>
+                            </div>
+                            <div class="game-icon"><img src="./assets/arcane-universe.png" alt="Arcane Universe icon"></div>
+                            <h3 class="font-bold text-lg text-white">Arcane Universe</h3>
+                            <p class="text-xs text-slate-400 mt-1">An incoming game. Managing the community server.</p>
+                            <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-purple-300">Server Manager</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-800/80 text-teal-300">Tester</span>
+                            </div>
+                            <div class="link-row">
+                                <div class="link-item"><a href="https://discord.gg/QsVbgbpP2z" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a></div>
+                            </div>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                            <span class="text-[11px] text-slate-400">Status: In Dev</span>
+                            <span class="text-xs text-purple-400 font-bold"><i class="fas fa-server"></i> Server Manager & Tester</span>
                         </div>
                     </div>
 
@@ -675,6 +798,10 @@
                         <span class="badge-cyan text-[10px] px-2 py-0.5 rounded font-bold">TESTER</span>
                     </div>
                     <p class="text-xs text-slate-300 leading-relaxed">An Incoming Arena Game. Can't reveal much.</p>
+                    <div class="link-row">
+                        <div class="link-item"><a href="https://www.roblox.com/games/102996892495028/Strikeout-Arena" target="_blank" class="link-pill rbx"><i class="rbx-ico"></i>Roblox</a></div>
+                        <div class="link-item"><a href="https://discord.gg/nugYCuRq6H" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a></div>
+                    </div>
                 </div>
 
                 <div class="glass-card p-5 rounded-2xl border-l-4 border-l-indigo-400">
@@ -683,6 +810,10 @@
                         <span class="badge-purple text-[10px] px-2 py-0.5 rounded font-bold">QA TEAM & T-MOD</span>
                     </div>
                     <p class="text-xs text-slate-300 leading-relaxed">Anime Roblox project. Active Tester, T-Mod, QA Team member, and Artist's Collector ensuring player feedback is categorized for developers.</p>
+                    <div class="link-row">
+                        <div class="link-item"><a href="https://www.roblox.com/games/91356007281562/Sora-Piece" target="_blank" class="link-pill rbx"><i class="rbx-ico"></i>Roblox</a><span class="link-stat">571.3k+ visits</span></div>
+                        <div class="link-item"><a href="https://discord.gg/eSE4dxWXw" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a><span class="link-stat">2k+ members</span></div>
+                    </div>
                 </div>
 
                 <div class="glass-card p-5 rounded-2xl border-l-4 border-l-amber-400">
@@ -691,6 +822,10 @@
                         <span class="text-amber-300 bg-amber-500/10 border border-amber-500/30 text-[10px] px-2 py-0.5 rounded font-bold">T-MOD & TESTER</span>
                     </div>
                     <p class="text-xs text-slate-300 leading-relaxed">Roblox game community. Contributing as an active Trial Moderator and Tester.</p>
+                    <div class="link-row">
+                        <div class="link-item"><a href="https://www.roblox.com/games/111097829542198/Legacy-Piece" target="_blank" class="link-pill rbx"><i class="rbx-ico"></i>Roblox</a><span class="link-stat">23.6M+ visits</span></div>
+                        <div class="link-item"><a href="https://discord.gg/legacypiece" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a><span class="link-stat">87k+ members</span></div>
+                    </div>
                 </div>
 
                 <div class="glass-card p-5 rounded-2xl border-l-4 border-l-pink-400">
@@ -699,6 +834,9 @@
                         <span class="badge-pink text-[10px] px-2 py-0.5 rounded font-bold">ADMINISTRATOR</span>
                     </div>
                     <p class="text-xs text-slate-300 leading-relaxed">I lwky don't have a clue of whats the game about 😭.</p>
+                    <div class="link-row">
+                        <div class="link-item"><a href="https://discord.gg/xsWATVr7Rh" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a></div>
+                    </div>
                 </div>
 
                 <div class="glass-card p-5 rounded-2xl border-l-4 border-l-purple-400">
@@ -731,6 +869,41 @@
                         <span class="text-amber-300 bg-amber-500/10 border border-amber-500/30 text-[10px] px-2 py-0.5 rounded font-bold">ADMINISTRATOR</span>
                     </div>
                     <p class="text-xs text-slate-300 leading-relaxed">Roblox cultivation clicker game. Contributing as an Administrator, overseeing the Qi-gathering, realm breakthrough, and layer-reset progression systems.</p>
+                    <div class="link-row">
+                        <div class="link-item"><a href="https://www.roblox.com/games/75317862071711/Immortality-Incremental" target="_blank" class="link-pill rbx"><i class="rbx-ico"></i>Roblox</a><span class="link-stat">37.7M visits</span></div>
+                        <div class="link-item"><a href="https://discord.gg/BJCqxsKKKU" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a><span class="link-stat">27k+ members</span></div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border-l-4 border-l-cyan-400">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-white text-base">Sailor Piece</h3>
+                        <span class="badge-cyan text-[10px] px-2 py-0.5 rounded font-bold">FORMER STAFF</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">Previously worked as Bot Developer, Event Hoster, Balancer and Concept Artist for the community.</p>
+                    <div class="link-row">
+                        <div class="link-item"><a href="https://www.roblox.com/games/77747658251236/Sailor-Piece" target="_blank" class="link-pill rbx"><i class="rbx-ico"></i>Roblox</a><span class="link-stat">1.5B+ visits</span></div>
+                        <div class="link-item"><a href="https://discord.gg/sailorpiece" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a><span class="link-stat">1.1M members</span></div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border-l-4 border-l-pink-400">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-white text-base">Chaos Studios</h3>
+                        <span class="badge-pink text-[10px] px-2 py-0.5 rounded font-bold">HEAD ADMIN</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">Incoming game. Working as Head Admin. Can't reveal much yet.</p>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border-l-4 border-l-purple-400">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-bold text-white text-base">Arcane Universe</h3>
+                        <span class="badge-purple text-[10px] px-2 py-0.5 rounded font-bold">SERVER MANAGER & TESTER</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">Incoming game. Working as Server Manager and Tester.</p>
+                    <div class="link-row">
+                        <div class="link-item"><a href="https://discord.gg/QsVbgbpP2z" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a></div>
+                    </div>
                 </div>
             </div>
         </section>
