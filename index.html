@@ -45,10 +45,10 @@
             --theme-secondary-rgb: 96, 165, 250;
         }
         body[data-theme="idol"] {
-            --theme-accent: #a855f7;
-            --theme-accent-rgb: 168, 85, 247;
-            --theme-secondary: #e879f9;
-            --theme-secondary-rgb: 232, 121, 249;
+            --theme-accent: #ec4899;
+            --theme-accent-rgb: 236, 72, 153;
+            --theme-secondary: #c084fc;
+            --theme-secondary-rgb: 192, 132, 252;
         }
         body[data-theme="zoro"] {
             --theme-accent: #22c55e;
@@ -59,8 +59,8 @@
         body[data-theme="bocchi"] {
             --theme-accent: #ff7eb6;
             --theme-accent-rgb: 255, 126, 182;
-            --theme-secondary: #f9a8d4;
-            --theme-secondary-rgb: 249, 168, 212;
+            --theme-secondary: #67e8f9;
+            --theme-secondary-rgb: 103, 232, 249;
         }
         
         .glass-panel {
@@ -363,16 +363,8 @@
 
     <script>
         (function () {
-            var themes = ['sky', 'idol', 'bocchi', 'zoro'];
-            var savedTheme = null;
-            try {
-                savedTheme = localStorage.getItem('nene-theme');
-            } catch (error) {
-                console.error('Unable to read the saved theme:', error);
-            }
-            var previousIndex = themes.indexOf(savedTheme);
-            var choice = previousIndex === -1 ? themes[0] : themes[(previousIndex + 1) % themes.length];
-            window.__themeSequence = themes;
+            var themes = ['sky', 'idol', 'zoro', 'bocchi'];
+            var choice = themes[Math.floor(Math.random() * themes.length)];
             window.__startTheme = choice;
 
             document.body.dataset.theme = choice;
@@ -430,11 +422,11 @@
                             <div class="flex items-center gap-1 text-[9px] text-slate-400">
                                 <button onclick="switchTheme('sky')" class="hover:text-teal-400 cursor-pointer">Sky</button>
                                 <span>•</span>
-                                <button onclick="switchTheme('idol')" class="hover:text-purple-400 cursor-pointer">Idol</button>
-                                <span>•</span>
-                                <button onclick="switchTheme('bocchi')" class="hover:text-pink-300 cursor-pointer">Bocchi</button>
+                                <button onclick="switchTheme('idol')" class="hover:text-pink-400 cursor-pointer">Idol</button>
                                 <span>•</span>
                                 <button onclick="switchTheme('zoro')" class="hover:text-green-400 cursor-pointer">Zoro</button>
+                                <span>•</span>
+                                <button onclick="switchTheme('bocchi')" class="hover:text-pink-300 cursor-pointer">Bocchi</button>
                             </div>
                         </div>
                     </div>
@@ -473,7 +465,7 @@
             
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                 <div class="glass-card p-4 rounded-2xl text-center">
-                    <div class="text-2xl font-extrabold text-teal-400 neon-glow font-mono">15+</div>
+                    <div class="text-2xl font-extrabold text-teal-400 neon-glow font-mono">20+</div>
                     <div class="text-xs text-slate-400 font-medium uppercase mt-1">Servers Managed</div>
                 </div>
                 <div class="glass-card p-4 rounded-2xl text-center">
@@ -538,11 +530,11 @@
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-cyan">TESTER & QA TEAM</span>
-                                <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">INCOMING GAME</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">LIVE GAME</span>
                             </div>
                             <div class="game-icon"><img src="./assets/strikeout-arena.png" alt="Strikeout Arena icon"></div>
                             <h3 class="font-bold text-lg text-white">Strikeout Arena</h3>
-                            <p class="text-xs text-slate-400 mt-1">An Incoming Arena Based Game.</p>
+                            <p class="text-xs text-slate-400 mt-1">An Arena Based Game.</p>
                             <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
                                 <span class="px-2 py-0.5 rounded bg-slate-800/80 text-teal-300">Lead Tester</span>
                                 <span class="px-2 py-0.5 rounded bg-slate-800/80 text-cyan-300">QA Manager</span>
@@ -554,7 +546,7 @@
                             </div>
                         </div>
                         <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
-                            <span class="text-[11px] text-slate-400">Status: In Dev</span>
+                            <span class="text-[11px] text-slate-400">Status: Released</span>
                             <span class="text-xs text-teal-400 font-bold"><i class="fas fa-check-circle"></i>Tester, QA Team & Admin</span>
                         </div>
                     </div>
@@ -564,7 +556,7 @@
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-purple">STAFF & TESTER</span>
-                                <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">ACTIVE</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">LIVE GAME</span>
                             </div>
                             <div class="game-icon"><img src="./assets/sora-piece.png" alt="Sora Piece icon"></div>
                             <h3 class="font-bold text-lg text-white">Sora Piece</h3>
@@ -591,7 +583,7 @@
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <span class="px-2.5 py-1 rounded-md text-[10px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30">FORMER STAFF</span>
-                                <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">ACTIVE</span>
+                                <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">LIVE GAME</span>
                             </div>
                             <div class="game-icon"><img src="./assets/legacy-piece.png" alt="Legacy Piece icon"></div>
                             <h3 class="font-bold text-lg text-white">Legacy Piece</h3>
@@ -761,7 +753,75 @@
                             <span class="text-xs text-pink-400 font-bold"><i class="fas fa-crown"></i> Head Admin</span>
                         </div>
                     </div>
+                    <!-- Blox Monster -->
+<div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center">
+    <div>
+        <div class="flex items-center justify-between mb-3">
+            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-cyan">ASSISTANT MANAGER</span>
+            <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">ACTIVE</span>
+        </div>
+        <div class="game-icon"><img src="./assets/blox-monster.png" alt="Blox Monster icon"></div>
+        <h3 class="font-bold text-lg text-white">Blox Monster</h3>
+        <p class="text-xs text-slate-400 mt-1">Roblox game community. Helping manage the staff team and server.</p>
+        <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
+            <span class="px-2 py-0.5 rounded bg-slate-800/80 text-cyan-300">Assistant Manager</span>
+        </div>
+        <div class="link-row">
+            <div class="link-item"><a href="https://www.roblox.com/games/106763540857326/Blox-Monster" target="_blank" class="link-pill rbx"><i class="rbx-ico"></i>Roblox</a></div>
+            <div class="link-item"><a href="https://discord.gg/6NgCezMUU6" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a></div>
+        </div>
+    </div>
+    <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+        <span class="text-[11px] text-slate-400">Status: Released</span>
+        <span class="text-xs text-cyan-400 font-bold"><i class="fas fa-user-tie"></i> Assistant Manager</span>
+    </div>
+</div>
 
+<!-- Standbound -->
+<div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-purple-500/30">
+    <div>
+        <div class="flex items-center justify-between mb-3">
+            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-purple">SUPERVISOR</span>
+            <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">INCOMING GAME</span>
+        </div>
+        <div class="game-icon"><img src="./assets/standbound.png" alt="Standbound icon"></div>
+        <h3 class="font-bold text-lg text-white">Standbound</h3>
+        <p class="text-xs text-slate-400 mt-1">An incoming game. Supervising the community staff.</p>
+        <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
+            <span class="px-2 py-0.5 rounded bg-slate-800/80 text-purple-300">Supervisor</span>
+        </div>
+        <div class="link-row">
+            <div class="link-item"><a href="https://discord.gg/kPR9fYXmab" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a></div>
+        </div>
+    </div>
+    <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+        <span class="text-[11px] text-slate-400">Status: In Dev</span>
+        <span class="text-xs text-purple-400 font-bold"><i class="fas fa-user-shield"></i> Supervisor</span>
+    </div>
+</div>
+
+<!-- Multiversal Piece -->
+<div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-pink-500/30">
+    <div>
+        <div class="flex items-center justify-between mb-3">
+            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold badge-pink">TRIAL MODERATOR</span>
+            <span class="px-2 py-0.5 rounded text-[9px] bg-slate-800 text-slate-400">INCOMING GAME</span>
+        </div>
+        <div class="game-icon"><img src="./assets/multiversal-piece.png" alt="Multiversal Piece icon"></div>
+        <h3 class="font-bold text-lg text-white">Multiversal Piece</h3>
+        <p class="text-xs text-slate-400 mt-1">An incoming game. Moderating the community server.</p>
+        <div class="mt-3 flex flex-wrap gap-1 text-[10px]">
+            <span class="px-2 py-0.5 rounded bg-slate-800/80 text-pink-300">Trial Moderator</span>
+        </div>
+        <div class="link-row">
+            <div class="link-item"><a href="https://discord.gg/WtwgSw7HYf" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a></div>
+        </div>
+    </div>
+    <div class="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+        <span class="text-[11px] text-slate-400">Status: In Dev</span>
+        <span class="text-xs text-pink-400 font-bold"><i class="fas fa-shield-halved"></i> Trial Mod</span>
+    </div>
+</div>
                     <!-- Arcane Universe -->
                     <div class="project-card-item min-w-[280px] max-w-[280px] md:min-w-[320px] glass-card rounded-2xl p-5 flex flex-col justify-between snap-center border-purple-500/30">
                         <div>
@@ -845,7 +905,39 @@
                         <div class="link-item"><a href="https://discord.gg/xsWATVr7Rh" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a></div>
                     </div>
                 </div>
+                <div class="glass-card p-5 rounded-2xl border-l-4 border-l-cyan-400">
+    <div class="flex justify-between items-start mb-2">
+        <h3 class="font-bold text-white text-base">Blox Monster</h3>
+        <span class="badge-cyan text-[10px] px-2 py-0.5 rounded font-bold">ASSISTANT MANAGER</span>
+    </div>
+    <p class="text-xs text-slate-300 leading-relaxed">Roblox game community. Working as Assistant Manager.</p>
+    <div class="link-row">
+        <div class="link-item"><a href="https://www.roblox.com/games/106763540857326/Blox-Monster" target="_blank" class="link-pill rbx"><i class="rbx-ico"></i>Roblox</a></div>
+        <div class="link-item"><a href="https://discord.gg/6NgCezMUU6" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a></div>
+    </div>
+</div>
 
+<div class="glass-card p-5 rounded-2xl border-l-4 border-l-purple-400">
+    <div class="flex justify-between items-start mb-2">
+        <h3 class="font-bold text-white text-base">Standbound</h3>
+        <span class="badge-purple text-[10px] px-2 py-0.5 rounded font-bold">SUPERVISOR</span>
+    </div>
+    <p class="text-xs text-slate-300 leading-relaxed">Incoming game. Working as Supervisor.</p>
+    <div class="link-row">
+        <div class="link-item"><a href="https://discord.gg/kPR9fYXmab" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a></div>
+    </div>
+</div>
+
+<div class="glass-card p-5 rounded-2xl border-l-4 border-l-pink-400">
+    <div class="flex justify-between items-start mb-2">
+        <h3 class="font-bold text-white text-base">Multiversal Piece</h3>
+        <span class="badge-pink text-[10px] px-2 py-0.5 rounded font-bold">TRIAL MODERATOR</span>
+    </div>
+    <p class="text-xs text-slate-300 leading-relaxed">Incoming game. Working as Trial Moderator.</p>
+    <div class="link-row">
+        <div class="link-item"><a href="https://discord.gg/WtwgSw7HYf" target="_blank" class="link-pill dc"><i class="fab fa-discord"></i>Discord</a></div>
+    </div>
+</div>
                 <div class="glass-card p-5 rounded-2xl border-l-4 border-l-purple-400">
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="font-bold text-white text-base">Monarch Studio</h3>
@@ -1413,16 +1505,12 @@
 
         const themeParticleColors = {
             sky: '59, 130, 246',
-            idol: '168, 85, 247',
+            idol: '236, 72, 153',
             zoro: '34, 197, 94',
             bocchi: '255, 126, 182'
         };
 
-        const themeSequence = window.__themeSequence;
-        const themeRotation = Object.fromEntries(themeSequence.map((theme, index) => [
-            theme,
-            themeSequence[(index + 1) % themeSequence.length]
-        ]));
+        const themeRotation = { sky: 'idol', idol: 'bocchi', bocchi: 'zoro', zoro: 'sky' };
 
         Object.values(audios).forEach(a => a.volume = volumeSlider.value);
 
@@ -1479,11 +1567,6 @@
             Object.values(audios).forEach(a => { a.pause(); a.currentTime = 0; });
             currentTrack = theme;
             document.body.dataset.theme = theme;
-            try {
-                localStorage.setItem('nene-theme', theme);
-            } catch (error) {
-                console.error('Unable to save the current theme:', error);
-            }
 
             const logoWrap = document.getElementById('brand-logo-wrap');
             const logoImg = document.getElementById('brand-logo-img');
